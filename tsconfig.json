@@ -5,7 +5,8 @@
     "module": "ESNext",         // ✅ Explicitly override the invalid "preserve"
     "paths": {
       "@/*": ["./*"]
-    }
+    },
+    "types": ["nativewind/types"]
   },
   "include": [
     "**/*.ts",
