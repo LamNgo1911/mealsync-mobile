@@ -4,6 +4,8 @@ import { Button, Text, View } from "react-native";
 export default function LoginScreen() {
   const router = useRouter();
 
+  console.log("Check login")
+
   return (
     <View>
       <Text>Login Screen</Text>
