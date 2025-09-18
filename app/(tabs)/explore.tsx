@@ -1,11 +1,9 @@
-import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { FlatList, Text, TextInput, View } from "react-native";
-// @ts-expect-error: Metro provides asset module typing
-import appIcon from "../../assets/images/logo.png";
+import { FlatList, TextInput, View } from "react-native";
 // @ts-expect-error: Metro provides asset module typing
 import meal1 from "../../assets/images/meal1.webp";
+import { Header } from "../../components/Header";
 import { RecipeCard } from "../../components/RecipeCard";
 import { SkeletonCard } from "../../components/SkeletonCard";
 import "../../global.css";
@@ -79,39 +77,11 @@ export default function ExploreScreen() {
 
   return (
     <View className="flex-1 bg-white">
-      {/* Header */}
-      <View className="pt-14 pb-4 px-6">
-        <View
-          style={{
-            position: "relative",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {/* Centered Title */}
-          <Text className="text-3xl font-bold text-gray-900 text-center">
-            Explore
-          </Text>
-          {/* Left Logo */}
-          <View
-            style={{
-              position: "absolute",
-              left: 0,
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              source={appIcon}
-              style={{ width: 28, height: 28, borderRadius: 6 }}
-              contentFit="cover"
-              accessibilityLabel="App logo"
-            />
-          </View>
-        </View>
+      <Header title="Explore" />
 
-        {/* Search Box */}
-        <View className="mt-5 rounded-2xl bg-gray-100 px-5 h-14 justify-center">
+      {/* Search Box */}
+      <View className="px-6 mb-4">
+        <View className="rounded-2xl bg-gray-100 px-5 h-14 justify-center">
           <TextInput
             placeholder="Search recipes"
             value={query}

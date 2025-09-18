@@ -2,8 +2,7 @@ import { Image } from "expo-image";
 import { Pressable, ScrollView, Text, View } from "react-native";
 // @ts-expect-error: Metro provides asset module typing
 import meal1 from "../../assets/images/meal1.webp";
-// @ts-expect-error: Metro provides asset module typing
-import appIcon from "../../assets/images/logo.png";
+import { Header } from "../../components/Header";
 import "../../global.css";
 
 type SavedRecipe = {
@@ -21,50 +20,7 @@ const SAVED_RECIPES: SavedRecipe[] = [
 export default function ProfileScreen() {
   return (
     <View className="flex-1 bg-white">
-      {/* Header */}
-      <View className="pt-14 pb-6 px-6">
-        <View
-          style={{
-            position: "relative",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {/* Centered Title */}
-          <Text className="text-2xl font-semibold text-gray-900 text-center">
-            Profile
-          </Text>
-          {/* Left Logo */}
-          <View
-            style={{
-              position: "absolute",
-              left: 0,
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              source={appIcon}
-              style={{ width: 28, height: 28, borderRadius: 6 }}
-              contentFit="cover"
-              accessibilityLabel="App logo"
-            />
-          </View>
-          {/* Right Settings */}
-          <View
-            style={{
-              position: "absolute",
-              right: 0,
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <View className="w-8 h-8 rounded-full bg-gray-100 items-center justify-center">
-              <Text className="text-lg">⚙️</Text>
-            </View>
-          </View>
-        </View>
-      </View>
+      <Header title="Profile" />
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Profile Section */}
