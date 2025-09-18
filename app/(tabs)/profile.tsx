@@ -2,6 +2,8 @@ import { Image } from "expo-image";
 import { Pressable, ScrollView, Text, View } from "react-native";
 // @ts-expect-error: Metro provides asset module typing
 import meal1 from "../../assets/images/meal1.webp";
+// @ts-expect-error: Metro provides asset module typing
+import appIcon from "../../assets/images/logo.png";
 import "../../global.css";
 
 type SavedRecipe = {
@@ -32,6 +34,22 @@ export default function ProfileScreen() {
           <Text className="text-2xl font-semibold text-gray-900 text-center">
             Profile
           </Text>
+          {/* Left Logo */}
+          <View
+            style={{
+              position: "absolute",
+              left: 0,
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Image
+              source={appIcon}
+              style={{ width: 28, height: 28, borderRadius: 6 }}
+              contentFit="cover"
+              accessibilityLabel="App logo"
+            />
+          </View>
           {/* Right Settings */}
           <View
             style={{
