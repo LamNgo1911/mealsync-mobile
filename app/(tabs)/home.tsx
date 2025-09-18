@@ -1,6 +1,7 @@
 import { Camera } from "expo-camera";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -13,6 +14,7 @@ import {
 import meal1 from "../../assets/images/meal1.webp";
 // @ts-expect-error: Metro provides asset module typing
 import appIcon from "../../assets/images/logo.png";
+import { SkeletonCard } from "../../components/SkeletonCard";
 import "../../global.css";
 
 type Meal = {
@@ -35,6 +37,16 @@ const RECOMMENDED_MEALS: Meal[] = [
 
 export default function HomeScreen() {
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate loading time for recommended meals
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
   const takePhoto = async () => {
     const { status } = await Camera.getCameraPermissionsAsync();
     if (status !== "granted") {
@@ -138,41 +150,75 @@ export default function HomeScreen() {
             Recommended Meals
           </Text>
 
-          <FlatList
-            horizontal
-            data={RECOMMENDED_MEALS}
-            keyExtractor={(item) => item.id}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingRight: 24 }}
-            renderItem={({ item }) => (
-              <Pressable
-                className="mr-4"
-                style={{ width: 200 }}
-                onPress={() =>
-                  router.push({
-                    pathname: "/recipe/[id]",
-                    params: { id: item.id },
-                  })
-                }
-              >
-                <View className="rounded-2xl overflow-hidden bg-gray-50">
-                  <Image
-                    source={item.image}
-                    style={{ width: "100%", height: 160 }}
-                    contentFit="cover"
-                  />
+          {loading ? (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingRight: 24 }}
+            >
+              {[1, 2, 3].map((index) => (
+                <View key={index} className="mr-4" style={{ width: 200 }}>
+                  <SkeletonCard />
+                  {/* Title skeleton */}
+                  <View className="mt-3">
+                    <View
+                      style={{
+                        height: 20,
+                        backgroundColor: "#E5E7EB",
+                        borderRadius: 4,
+                        marginBottom: 8,
+                        width: "80%",
+                      }}
+                    />
+                    <View
+                      style={{
+                        height: 16,
+                        backgroundColor: "#E5E7EB",
+                        borderRadius: 4,
+                        width: "60%",
+                      }}
+                    />
+                  </View>
                 </View>
-                <View className="mt-3">
-                  <Text className="text-lg font-semibold text-gray-900">
-                    {item.title}
-                  </Text>
-                  <Text className="text-sm text-gray-500 mt-1">
-                    {item.category}
-                  </Text>
-                </View>
-              </Pressable>
-            )}
-          />
+              ))}
+            </ScrollView>
+          ) : (
+            <FlatList
+              horizontal
+              data={RECOMMENDED_MEALS}
+              keyExtractor={(item) => item.id}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingRight: 24 }}
+              renderItem={({ item }) => (
+                <Pressable
+                  className="mr-4"
+                  style={{ width: 200 }}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/recipe/[id]",
+                      params: { id: item.id },
+                    })
+                  }
+                >
+                  <View className="rounded-2xl overflow-hidden bg-gray-50">
+                    <Image
+                      source={item.image}
+                      style={{ width: "100%", height: 160 }}
+                      contentFit="cover"
+                    />
+                  </View>
+                  <View className="mt-3">
+                    <Text className="text-lg font-semibold text-gray-900">
+                      {item.title}
+                    </Text>
+                    <Text className="text-sm text-gray-500 mt-1">
+                      {item.category}
+                    </Text>
+                  </View>
+                </Pressable>
+              )}
+            />
+          )}
         </View>
       </ScrollView>
     </View>
