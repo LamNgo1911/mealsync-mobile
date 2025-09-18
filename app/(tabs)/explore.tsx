@@ -2,13 +2,12 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { FlatList, Text, TextInput, View } from "react-native";
-import { RecipeCard } from "../../components/RecipeCard";
-import { SkeletonCard } from "../../components/SkeletonCard";
-// @ts-expect-error: Metro provides asset module typing
-import meal1 from "../../assets/images/meal1.webp";
 // @ts-expect-error: Metro provides asset module typing
 import appIcon from "../../assets/images/logo.png";
 // @ts-expect-error: Metro provides asset module typing
+import meal1 from "../../assets/images/meal1.webp";
+import { RecipeCard } from "../../components/RecipeCard";
+import { SkeletonCard } from "../../components/SkeletonCard";
 import "../../global.css";
 
 type Recipe = {
