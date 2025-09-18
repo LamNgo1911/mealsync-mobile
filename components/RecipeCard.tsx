@@ -5,7 +5,7 @@ import { Pressable, Text, View } from "react-native";
 export type RecipeCardProps = {
   id: string;
   title: string;
-  imageUrl: string;
+  image: any;
   rating?: number;
   tag?: string;
   onPress?: (id: string) => void;
@@ -14,11 +14,12 @@ export type RecipeCardProps = {
 function RecipeCardComponent({
   id,
   title,
-  imageUrl,
+  image,
   rating,
   tag,
   onPress,
 }: RecipeCardProps) {
+  const source = typeof image === "string" ? { uri: image } : image;
   return (
     <Pressable
       onPress={() => onPress?.(id)}
@@ -26,11 +27,17 @@ function RecipeCardComponent({
       accessibilityRole="button"
       accessibilityLabel={title}
     >
-      <View className="rounded-2xl overflow-hidden bg-white">
+      <View
+        style={{
+          borderRadius: 16,
+          overflow: "hidden",
+          backgroundColor: "white",
+        }}
+      >
         <Image
-          source={{ uri: imageUrl }}
+          source={source}
           contentFit="cover"
-          className="w-full h-48"
+          style={{ width: "100%", height: 192 }}
           transition={150}
         />
       </View>
