@@ -1,7 +1,8 @@
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { Animated, FlatList, Text, TextInput, View } from "react-native";
+import { FlatList, Text, TextInput, View } from "react-native";
 import { RecipeCard } from "../../components/RecipeCard";
+import { SkeletonCard } from "../../components/SkeletonCard";
 // @ts-expect-error: Metro provides asset module typing
 import meal1 from "../../assets/images/meal1.webp";
 import "../../global.css";
@@ -13,6 +14,7 @@ type Recipe = {
   rating: number;
   tag: string;
 };
+type SkeletonItem = { id: string; skeleton: true };
 
 const MOCK_RECIPES: Recipe[] = [
   { id: "1", title: "Vegan Delight", image: meal1, rating: 4.5, tag: "Vegan" },
@@ -93,28 +95,41 @@ export default function ExploreScreen() {
       {/* Recipes List */}
       <FlatList
         numColumns={2}
-        data={loading ? Array.from({ length: 6 }).map((_, i) => ({ id: `s-${i}` })) : data}
+        data={
+          (loading
+            ? (Array.from({ length: 6 }).map((_, i) => ({
+                id: `s-${i}`,
+                skeleton: true,
+              })) as SkeletonItem[])
+            : data) as (Recipe | SkeletonItem)[]
+        }
         keyExtractor={(item) => item.id}
         contentContainerClassName="px-6 pb-6 "
         columnWrapperClassName="justify-between gap-6"
-        renderItem={({ item }) => (
-          <View className="flex-1">
-            {loading ? (
-              <SkeletonCard />
-            ) : (
+        renderItem={({ item }) => {
+          if ((item as SkeletonItem).skeleton) {
+            return (
+              <View className="flex-1">
+                <SkeletonCard />
+              </View>
+            );
+          }
+          const r = item as Recipe;
+          return (
+            <View className="flex-1">
               <RecipeCard
-                id={item.id}
-                title={item.title}
-                image={item.image}
-                rating={item.rating}
-                tag={item.tag}
+                id={r.id}
+                title={r.title}
+                image={r.image}
+                rating={r.rating}
+                tag={r.tag}
                 onPress={(id) =>
                   router.push({ pathname: "/recipe/[id]", params: { id } })
                 }
               />
-            )}
-          </View>
-        )}
+            </View>
+          );
+        }}
         ItemSeparatorComponent={() => <View className="h-7" />}
         showsVerticalScrollIndicator={false}
       />
@@ -122,49 +137,4 @@ export default function ExploreScreen() {
   );
 }
 
-function SkeletonCard() {
-  const opacity = new Animated.Value(0.5);
-  useEffect(() => {
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(opacity, { toValue: 1, duration: 600, useNativeDriver: true }),
-        Animated.timing(opacity, { toValue: 0.5, duration: 600, useNativeDriver: true }),
-      ])
-    );
-    loop.start();
-    return () => loop.stop();
-  }, []);
-
-  return (
-    <View>
-      <Animated.View
-        style={{
-          width: "100%",
-          height: 192,
-          borderRadius: 16,
-          backgroundColor: "#E5E7EB",
-          opacity,
-        }}
-      />
-      <Animated.View
-        style={{
-          marginTop: 12,
-          height: 22,
-          borderRadius: 6,
-          backgroundColor: "#E5E7EB",
-          opacity,
-        }}
-      />
-      <Animated.View
-        style={{
-          marginTop: 8,
-          height: 18,
-          width: "60%",
-          borderRadius: 6,
-          backgroundColor: "#E5E7EB",
-          opacity,
-        }}
-      />
-    </View>
-  );
-}
+// SkeletonCard moved to components/SkeletonCard
