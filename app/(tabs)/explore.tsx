@@ -1,3 +1,4 @@
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { FlatList, Text, TextInput, View } from "react-native";
@@ -5,6 +6,9 @@ import { RecipeCard } from "../../components/RecipeCard";
 import { SkeletonCard } from "../../components/SkeletonCard";
 // @ts-expect-error: Metro provides asset module typing
 import meal1 from "../../assets/images/meal1.webp";
+// @ts-expect-error: Metro provides asset module typing
+import appIcon from "../../assets/images/logo.png";
+// @ts-expect-error: Metro provides asset module typing
 import "../../global.css";
 
 type Recipe = {
@@ -78,16 +82,47 @@ export default function ExploreScreen() {
     <View className="flex-1 bg-white">
       {/* Header */}
       <View className="pt-14 pb-4 px-6">
-        <Text className="text-3xl font-bold text-gray-900">Explore</Text>
+        <View
+          style={{
+            position: "relative",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {/* Centered Title */}
+          <Text className="text-3xl font-bold text-gray-900 text-center">
+            Explore
+          </Text>
+          {/* Left Logo */}
+          <View
+            style={{
+              position: "absolute",
+              left: 0,
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Image
+              source={appIcon}
+              style={{ width: 28, height: 28, borderRadius: 6 }}
+              contentFit="cover"
+              accessibilityLabel="App logo"
+            />
+          </View>
+        </View>
 
         {/* Search Box */}
-        <View className="mt-5 rounded-2xl bg-gray-100 px-5 py-4">
+        <View className="mt-5 rounded-2xl bg-gray-100 px-5 h-14 justify-center">
           <TextInput
             placeholder="Search recipes"
             value={query}
             onChangeText={setQuery}
             className="text-lg text-gray-700"
             placeholderTextColor="#9CA3AF"
+            style={{
+              lineHeight: 20, // 👈 force a stable line height
+              textAlignVertical: "center", // 👈 Android vertical align
+            }}
           />
         </View>
       </View>
