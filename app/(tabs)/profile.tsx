@@ -26,29 +26,10 @@ export default function ProfileScreen() {
         {/* Profile Section */}
         <View className="items-center px-6 mb-8">
           {/* Profile Image */}
-          <View
-            style={{
-              width: 120,
-              height: 120,
-              borderRadius: 60,
-              backgroundColor: "#D1B894",
-              marginBottom: 20,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+          <View className="w-30 h-30 rounded-full bg-amber-200 mb-5 items-center justify-center">
             {/* Placeholder for profile image - you can replace with actual image */}
-            <View
-              style={{
-                width: 100,
-                height: 100,
-                borderRadius: 50,
-                backgroundColor: "#C4A47C",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Text style={{ fontSize: 40, color: "#8B4513" }}>👤</Text>
+            <View className="w-25 h-25 rounded-full bg-amber-300 items-center justify-center">
+              <Text className="text-4xl text-amber-800">👤</Text>
             </View>
           </View>
 
@@ -70,18 +51,14 @@ export default function ProfileScreen() {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingRight: 24 }}
+            className="pr-6"
           >
             {SAVED_RECIPES.map((recipe) => (
-              <Pressable
-                key={recipe.id}
-                className="mr-4"
-                style={{ width: 200 }}
-              >
+              <Pressable key={recipe.id} className="mr-4 w-50">
                 <View className="rounded-2xl overflow-hidden bg-gray-50">
                   <Image
                     source={recipe.image}
-                    style={{ width: "100%", height: 160 }}
+                    className="w-full h-40"
                     contentFit="cover"
                   />
                 </View>
@@ -96,7 +73,7 @@ export default function ProfileScreen() {
         </View>
 
         {/* Additional spacing at bottom */}
-        <View style={{ height: 40 }} />
+        <View className="h-10" />
       </ScrollView>
     </View>
   );
