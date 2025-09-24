@@ -1,11 +1,10 @@
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { FlatList, TextInput, View } from "react-native";
-// @ts-expect-error: Metro provides asset module typing
-import meal1 from "../../assets/images/meal1.webp";
 import { Header } from "../../components/Header";
 import { RecipeCard } from "../../components/RecipeCard";
 import { SkeletonCard } from "../../components/SkeletonCard";
+import { getExploreRecipes } from "../../data/recipes";
 import "../../global.css";
 
 type Recipe = {
@@ -17,44 +16,7 @@ type Recipe = {
 };
 type SkeletonItem = { id: string; skeleton: true };
 
-const MOCK_RECIPES: Recipe[] = [
-  { id: "1", title: "Vegan Delight", image: meal1, rating: 4.5, tag: "Vegan" },
-  {
-    id: "2",
-    title: "Quick & Easy Pasta",
-    image: meal1,
-    rating: 4.2,
-    tag: "20 min",
-  },
-  {
-    id: "3",
-    title: "Spicy Chicken Stir-Fry",
-    image: meal1,
-    rating: 4.8,
-    tag: "Spicy",
-  },
-  {
-    id: "4",
-    title: "Mediterranean Salad",
-    image: meal1,
-    rating: 4.6,
-    tag: "Healthy",
-  },
-  {
-    id: "5",
-    title: "Hearty Beef Stew",
-    image: meal1,
-    rating: 4.3,
-    tag: "Comfort",
-  },
-  {
-    id: "6",
-    title: "Fresh Salmon Grill",
-    image: meal1,
-    rating: 4.7,
-    tag: "Light",
-  },
-];
+const MOCK_RECIPES = getExploreRecipes();
 
 export default function ExploreScreen() {
   const router = useRouter();
@@ -81,17 +43,13 @@ export default function ExploreScreen() {
 
       {/* Search Box */}
       <View className="px-6 mb-4">
-        <View className="rounded-2xl bg-gray-100 px-5 h-14 justify-center">
+        <View className="rounded-2xl bg-neutral-100 px-5 h-14 justify-center">
           <TextInput
             placeholder="Search recipes"
             value={query}
             onChangeText={setQuery}
-            className="text-lg text-gray-700"
-            placeholderTextColor="#9CA3AF"
-            style={{
-              lineHeight: 20, // 👈 force a stable line height
-              textAlignVertical: "center", // 👈 Android vertical align
-            }}
+            className="text-lg text-neutral-700 h-full"
+            placeholderTextColor="#94a3b8"
           />
         </View>
       </View>
@@ -101,15 +59,15 @@ export default function ExploreScreen() {
         numColumns={2}
         data={
           (loading
-            ? (Array.from({ length: 6 }).map((_, i) => ({
+            ? Array.from({ length: 6 }).map((_, i) => ({
                 id: `s-${i}`,
                 skeleton: true,
-              })) as SkeletonItem[])
+              }))
             : data) as (Recipe | SkeletonItem)[]
         }
         keyExtractor={(item) => item.id}
-        contentContainerClassName="px-6 pb-6 "
-        columnWrapperClassName="justify-between gap-6"
+        contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 24 }}
+        columnWrapperStyle={{ justifyContent: "space-between", gap: 24 }}
         renderItem={({ item }) => {
           if ((item as SkeletonItem).skeleton) {
             return (
@@ -140,5 +98,3 @@ export default function ExploreScreen() {
     </View>
   );
 }
-
-// SkeletonCard moved to components/SkeletonCard

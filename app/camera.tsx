@@ -1,8 +1,9 @@
-import { CameraView } from "expo-camera";
+import { Camera, CameraView } from "expo-camera";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Alert, Animated, Pressable, Text, View } from "react-native";
+import "../global.css";
 
 export default function CameraScreen() {
   const router = useRouter();
@@ -10,13 +11,20 @@ export default function CameraScreen() {
   const [photo, setPhoto] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const rotateAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      setHasPermission(status === "granted");
+    })();
+  }, []);
 
   const startScanning = () => {
     setProcessing(true);
     setProgress(0);
 
-    // Start rotating border animation
     const rotation = Animated.loop(
       Animated.timing(rotateAnim, {
         toValue: 1,
@@ -27,20 +35,19 @@ export default function CameraScreen() {
 
     rotation.start();
 
-    // Update progress every 100ms
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(progressInterval);
           return 100;
         }
-        return prev + 3.33; // Increment to reach 100% in 3 seconds
+        return prev + 3.33;
       });
     }, 100);
 
-    // Stop processing after 3 seconds
     setTimeout(() => {
       rotation.stop();
+      rotateAnim.setValue(0);
       clearInterval(progressInterval);
       setProcessing(false);
       setProgress(0);
@@ -58,8 +65,9 @@ export default function CameraScreen() {
         const result = await cameraRef.current.takePictureAsync();
         if (result?.uri) {
           setPhoto(result.uri);
-          // Start scanning automatically after photo is taken
-          setTimeout(() => startScanning(), 500); // Small delay for photo display
+          setTimeout(() => startScanning(), 500);
+        } else {
+          Alert.alert("Error", "No photo URI received");
         }
       } catch (error) {
         Alert.alert("Error", "Failed to take photo");
@@ -67,9 +75,31 @@ export default function CameraScreen() {
     }
   };
 
-  const retakePhoto = () => {
-    setPhoto(null);
-  };
+  const retakePhoto = () => setPhoto(null);
+
+  if (hasPermission === null) {
+    return (
+      <View className="flex-1 bg-black items-center justify-center">
+        <Text className="text-white text-lg">
+          Requesting camera permission...
+        </Text>
+      </View>
+    );
+  }
+
+  if (hasPermission === false) {
+    return (
+      <View className="flex-1 bg-black items-center justify-center">
+        <Text className="text-white text-lg mb-4">No access to camera</Text>
+        <Pressable
+          className="bg-blue-500 px-6 py-3 rounded-lg"
+          onPress={() => router.back()}
+        >
+          <Text className="text-white font-semibold">Go Back</Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   if (photo) {
     const spin = rotateAnim.interpolate({
@@ -82,99 +112,60 @@ export default function CameraScreen() {
         {/* Header */}
         <View className="pt-14 pb-6 px-6">
           <Pressable onPress={() => router.back()}>
-            <Text className="text-lg text-blue-600">✕ Close</Text>
+            <Text className="text-lg text-primary-600">✕ Close</Text>
           </Pressable>
         </View>
 
-        {/* Photo in Circular Container */}
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            paddingHorizontal: 40,
-          }}
-        >
-          <View style={{ position: "relative" }}>
-            {/* Rotating Border */}
+        {/* Photo Container */}
+        <View className="flex-1 items-center justify-center">
+          <View className="relative">
+            <View className="w-72 h-72 rounded-full overflow-hidden bg-neutral-100 border-2 border-neutral-200 z-10">
+              <Image
+                source={{ uri: photo }}
+                className="w-full h-full"
+                contentFit="cover"
+              />
+            </View>
+
             {processing && (
               <Animated.View
                 style={{
                   position: "absolute",
-                  width: 280,
-                  height: 280,
-                  borderRadius: 140,
+                  width: 320,
+                  height: 320,
+                  borderRadius: 160,
                   borderWidth: 4,
                   borderColor: "transparent",
-                  borderTopColor: "#10B981",
-                  borderRightColor: "#10B981",
-                  transform: [{ rotate: spin }],
+                  borderTopColor: "#10b981",
+                  borderRightColor: "#10b981",
                   top: -10,
                   left: -10,
+                  zIndex: 20,
+                  transform: [{ rotate: spin }],
                 }}
               />
             )}
-
-            {/* Photo Circle */}
-            <View
-              style={{
-                width: 260,
-                height: 260,
-                borderRadius: 130,
-                overflow: "hidden",
-                borderWidth: processing ? 0 : 2,
-                borderColor: "#E5E7EB",
-              }}
-            >
-              <Image
-                source={{ uri: photo }}
-                style={{ width: "100%", height: "100%" }}
-                contentFit="cover"
-              />
-            </View>
           </View>
 
-          {/* Processing Text and Progress */}
           {processing && (
-            <View style={{ alignItems: "center", marginTop: 30 }}>
-              <Text
-                style={{
-                  fontSize: 18,
-                  fontWeight: "600",
-                  color: "#10B981",
-                  textAlign: "center",
-                  marginBottom: 10,
-                }}
-              >
+            <View className="items-center mt-8">
+              <Text className="text-lg font-semibold text-accent-500 mb-2.5 text-center">
                 Scanning ingredients...
               </Text>
-              <Text
-                style={{
-                  fontSize: 24,
-                  fontWeight: "700",
-                  color: "#10B981",
-                  textAlign: "center",
-                }}
-              >
+              <Text className="text-2xl font-bold text-accent-500 text-center">
                 {Math.round(progress)}%
               </Text>
             </View>
           )}
         </View>
 
-        {/* Bottom Button */}
         {!processing && (
           <View className="p-6">
             <Pressable
-              style={{
-                backgroundColor: "#6B7280",
-                borderRadius: 16,
-                padding: 16,
-                alignItems: "center",
-              }}
+              className="bg-neutral-500 rounded-2xl p-4 items-center shadow-sm"
               onPress={retakePhoto}
             >
-              <Text style={{ color: "white", fontWeight: "600", fontSize: 18 }}>
+              <Text className="text-white font-semibold text-lg">
                 Retake Photo
               </Text>
             </Pressable>
@@ -186,7 +177,7 @@ export default function CameraScreen() {
 
   return (
     <View className="flex-1 bg-black">
-      <CameraView ref={cameraRef} style={{ flex: 1 }} facing="back" />
+      <CameraView ref={cameraRef} className="flex-1" facing="back" />
 
       {/* Header */}
       <View className="absolute top-0 left-0 right-0 pt-14 pb-4 px-6">
@@ -199,19 +190,17 @@ export default function CameraScreen() {
       </View>
 
       {/* Bottom Controls */}
-      <View className="absolute bottom-0 left-0 right-0 p-6">
-        <View className="items-center">
-          <Text className="text-white text-center mb-6">
-            Point camera at ingredients to scan
-          </Text>
+      <View className="absolute bottom-0 left-0 right-0 p-6 items-center">
+        <Text className="text-white text-center mb-6">
+          Point camera at ingredients to scan
+        </Text>
 
-          <Pressable
-            className="w-20 h-20 bg-white rounded-full items-center justify-center"
-            onPress={takePicture}
-          >
-            <View className="w-16 h-16 bg-white rounded-full border-4 border-gray-300" />
-          </Pressable>
-        </View>
+        <Pressable
+          className="w-20 h-20 bg-white rounded-full items-center justify-center"
+          onPress={takePicture}
+        >
+          <View className="w-16 h-16 bg-white rounded-full border-4 border-gray-300" />
+        </Pressable>
       </View>
     </View>
   );

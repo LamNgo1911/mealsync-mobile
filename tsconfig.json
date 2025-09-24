@@ -11,7 +11,7 @@
     "types": [
       "nativewind/types"
     ],
-    "jsx": "react-native"
+    "jsx": "react-jsx"
   },
   "include": [
     "**/*.ts",

@@ -1,13 +1,6 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import {
-  Alert,
-  FlatList,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { FlatList, Pressable, Text, TextInput, View } from "react-native";
 
 type Ingredient = {
   id: string;
@@ -36,12 +29,10 @@ export default function ManualInputScreen() {
 
   const findRecipes = () => {
     if (ingredients.length === 0) {
-      Alert.alert("No ingredients", "Please add at least one ingredient");
+      alert("Please add at least one ingredient");
       return;
     }
-
-    Alert.alert(
-      "Recipe Search",
+    alert(
       `Searching recipes with: ${ingredients.map((i) => i.name).join(", ")}`
     );
     router.back();
@@ -53,38 +44,38 @@ export default function ManualInputScreen() {
       <View className="pt-14 pb-4 px-6">
         <View className="flex-row items-center justify-between">
           <Pressable onPress={() => router.back()}>
-            <Text className="text-lg text-blue-600">Cancel</Text>
+            <Text className="text-lg text-primary-600">Cancel</Text>
           </Pressable>
-          <Text className="text-xl font-semibold text-gray-900">
+          <Text className="text-xl font-semibold text-neutral-900">
             Manual Input
           </Text>
           <Pressable onPress={findRecipes}>
-            <Text className="text-lg text-blue-600 font-medium">Done</Text>
+            <Text className="text-lg text-primary-600 font-medium">Done</Text>
           </Pressable>
         </View>
       </View>
 
       {/* Input Section */}
       <View className="px-6 mb-6">
-        <Text className="text-lg font-medium text-gray-900 mb-3">
+        <Text className="text-lg font-medium text-neutral-900 mb-3">
           Add Ingredients
         </Text>
 
         <View className="flex-row gap-3">
-          <View className="flex-1 rounded-2xl bg-gray-100 px-4 py-3">
+          <View className="flex-1 rounded-2xl bg-neutral-100 px-4 py-3">
             <TextInput
               placeholder="Enter ingredient name"
               value={inputText}
               onChangeText={setInputText}
-              className="text-lg text-gray-700"
-              placeholderTextColor="#9CA3AF"
+              className="text-lg text-neutral-700 h-full"
+              placeholderTextColor="#94a3b8"
               onSubmitEditing={addIngredient}
               returnKeyType="done"
             />
           </View>
 
           <Pressable
-            className="bg-blue-600 rounded-2xl px-6 py-3 justify-center"
+            className="bg-primary-600 rounded-2xl px-6 py-3 justify-center shadow-sm"
             onPress={addIngredient}
           >
             <Text className="text-white font-medium text-lg">Add</Text>
@@ -101,8 +92,8 @@ export default function ManualInputScreen() {
         {ingredients.length === 0 ? (
           <View className="flex-1 items-center justify-center">
             <Text className="text-gray-500 text-center text-lg">
-              No ingredients added yet.{"\n"}
-              Start by typing an ingredient above.
+              No ingredients added yet.{"\n"}Start by typing an ingredient
+              above.
             </Text>
           </View>
         ) : (
