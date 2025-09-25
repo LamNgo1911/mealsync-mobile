@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Header } from "../../components/Header";
 import {
@@ -10,25 +10,30 @@ import {
   FontWeights,
   Spacing,
 } from "../../constants/theme";
-import { getRecipeById, type Ingredient } from "../../data/recipes";
+import { getRecipeById, RecipeIngredient } from "../../data/recipes";
+
+// Client-side state for checkboxes
+type IngredientState = RecipeIngredient & { checked: boolean };
 
 export default function RecipeDetail() {
   const { id } = useLocalSearchParams();
-  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [ingredients, setIngredients] = useState<IngredientState[]>([]);
 
   const recipe = getRecipeById(id as string);
 
   // Initialize ingredients state when recipe loads
-  useEffect(() => {
+  useState(() => {
     if (recipe) {
-      setIngredients(recipe.ingredients);
+      setIngredients(
+        recipe.ingredients.map((ing) => ({ ...ing, checked: false }))
+      );
     }
-  }, [recipe]);
+  });
 
-  const toggleIngredient = (ingredientId: string) => {
+  const toggleIngredient = (ingredientName: string) => {
     setIngredients((prev) =>
       prev.map((ingredient) =>
-        ingredient.id === ingredientId
+        ingredient.name === ingredientName
           ? { ...ingredient, checked: !ingredient.checked }
           : ingredient
       )
@@ -50,14 +55,18 @@ export default function RecipeDetail() {
 
   return (
     <View style={styles.container}>
-      <Header title={recipe.title || "Recipe"} />
+      <Header title={recipe.name || "Recipe"} />
 
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
       >
         {/* Recipe Image */}
-        <Image source={recipe.image} style={styles.image} contentFit="cover" />
+        <Image
+          source={recipe.imageUrl}
+          style={styles.image}
+          contentFit="cover"
+        />
 
         {/* Recipe Content */}
         <View style={styles.contentContainer}>
@@ -70,9 +79,9 @@ export default function RecipeDetail() {
             <View>
               {ingredients.map((ingredient) => (
                 <Pressable
-                  key={ingredient.id}
+                  key={ingredient.name}
                   style={styles.ingredientRow}
-                  onPress={() => toggleIngredient(ingredient.id)}
+                  onPress={() => toggleIngredient(ingredient.name)}
                 >
                   <View
                     style={[
@@ -90,7 +99,7 @@ export default function RecipeDetail() {
                       ingredient.checked && styles.ingredientTextChecked,
                     ]}
                   >
-                    {ingredient.text}
+                    {`${ingredient.quantity} ${ingredient.unit} ${ingredient.name}`}
                   </Text>
                 </Pressable>
               ))}
@@ -106,11 +115,7 @@ export default function RecipeDetail() {
                   <View style={styles.instructionStep}>
                     <Text style={styles.instructionStepText}>{index + 1}</Text>
                   </View>
-                  <Text style={styles.instructionText}>
-                    {typeof instruction === "string"
-                      ? instruction
-                      : instruction.text}
-                  </Text>
+                  <Text style={styles.instructionText}>{instruction}</Text>
                 </View>
               ))}
             </View>

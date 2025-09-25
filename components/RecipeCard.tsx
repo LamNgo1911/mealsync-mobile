@@ -11,28 +11,28 @@ import {
 
 export type RecipeCardProps = {
   id: string;
-  title: string;
-  image: any;
+  name: string;
+  imageUrl: any;
   rating?: number;
-  tag?: string;
+  tags?: string[];
   onPress?: (id: string) => void;
 };
 
 function RecipeCardComponent({
   id,
-  title,
-  image,
+  name,
+  imageUrl,
   rating,
-  tag,
+  tags,
   onPress,
 }: RecipeCardProps) {
-  const source = typeof image === "string" ? { uri: image } : image;
+  const source = typeof imageUrl === "string" ? { uri: imageUrl } : imageUrl;
   return (
     <Pressable
       onPress={() => onPress?.(id)}
       style={styles.container}
       accessibilityRole="button"
-      accessibilityLabel={title}
+      accessibilityLabel={name}
     >
       <View style={styles.imageContainer}>
         <Image
@@ -43,13 +43,15 @@ function RecipeCardComponent({
         />
       </View>
       <Text style={styles.title} numberOfLines={2}>
-        {title}
+        {name}
       </Text>
       <View style={styles.detailsContainer}>
         {typeof rating === "number" && (
           <Text style={styles.rating}>{rating.toFixed(1)}</Text>
         )}
-        {tag ? <Text style={styles.tag}>• {tag}</Text> : null}
+        {tags && tags.length > 0 ? (
+          <Text style={styles.tag}>• {tags[0]}</Text>
+        ) : null}
       </View>
     </Pressable>
   );

@@ -86,10 +86,10 @@ export default function ExploreScreen() {
             <View style={styles.cardContainer}>
               <RecipeCard
                 id={r.id}
-                title={r.title}
-                image={r.image}
+                name={r.title}
+                imageUrl={r.image}
                 rating={r.rating}
-                tag={r.tag}
+                tags={[r.tag]}
                 onPress={(id) =>
                   router.push({ pathname: "/recipe/[id]", params: { id } })
                 }
