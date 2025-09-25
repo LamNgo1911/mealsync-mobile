@@ -1,11 +1,16 @@
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { FlatList, TextInput, View } from "react-native";
+import { FlatList, StyleSheet, TextInput, View } from "react-native";
 import { Header } from "../../components/Header";
 import { RecipeCard } from "../../components/RecipeCard";
 import { SkeletonCard } from "../../components/SkeletonCard";
+import {
+  BorderRadius,
+  Colors,
+  FontSizes,
+  Spacing,
+} from "../../constants/theme";
 import { getExploreRecipes } from "../../data/recipes";
-import "../../global.css";
 
 type Recipe = {
   id: string;
@@ -38,18 +43,18 @@ export default function ExploreScreen() {
   }, [query]);
 
   return (
-    <View className="flex-1 bg-white">
+    <View style={styles.container}>
       <Header title="Explore" />
 
       {/* Search Box */}
-      <View className="px-6 mb-4">
-        <View className="rounded-2xl bg-neutral-100 px-5 h-14 justify-center">
+      <View style={styles.searchContainer}>
+        <View style={styles.searchBox}>
           <TextInput
             placeholder="Search recipes"
             value={query}
             onChangeText={setQuery}
-            className="text-lg text-neutral-700 h-full"
-            placeholderTextColor="#94a3b8"
+            style={styles.searchInput}
+            placeholderTextColor={Colors.neutral[400]}
           />
         </View>
       </View>
@@ -66,19 +71,19 @@ export default function ExploreScreen() {
             : data) as (Recipe | SkeletonItem)[]
         }
         keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 24 }}
-        columnWrapperStyle={{ justifyContent: "space-between", gap: 24 }}
+        contentContainerStyle={styles.listContentContainer}
+        columnWrapperStyle={styles.listColumnWrapper}
         renderItem={({ item }) => {
           if ((item as SkeletonItem).skeleton) {
             return (
-              <View className="flex-1">
+              <View style={styles.cardContainer}>
                 <SkeletonCard />
               </View>
             );
           }
           const r = item as Recipe;
           return (
-            <View className="flex-1">
+            <View style={styles.cardContainer}>
               <RecipeCard
                 id={r.id}
                 title={r.title}
@@ -92,9 +97,46 @@ export default function ExploreScreen() {
             </View>
           );
         }}
-        ItemSeparatorComponent={() => <View className="h-7" />}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
         showsVerticalScrollIndicator={false}
       />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.white,
+  },
+  searchContainer: {
+    paddingHorizontal: Spacing[6],
+    marginBottom: Spacing[4],
+  },
+  searchBox: {
+    borderRadius: BorderRadius["2xl"],
+    backgroundColor: Colors.neutral[100],
+    paddingHorizontal: 20, // px-5
+    height: 56, // h-14
+    justifyContent: "center",
+  },
+  searchInput: {
+    fontSize: FontSizes.lg,
+    color: Colors.neutral[700],
+    height: "100%",
+  },
+  listContentContainer: {
+    paddingHorizontal: Spacing[6],
+    paddingBottom: Spacing[6],
+  },
+  listColumnWrapper: {
+    justifyContent: "space-between",
+    gap: Spacing[6],
+  },
+  cardContainer: {
+    flex: 1,
+  },
+  separator: {
+    height: 28, // h-7
+  },
+});

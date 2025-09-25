@@ -1,11 +1,17 @@
 import { Camera } from "expo-camera";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Header } from "../../components/Header";
 import { RecipeSection } from "../../components/RecipeSection";
+import {
+  BorderRadius,
+  Colors,
+  FontSizes,
+  FontWeights,
+  Spacing,
+} from "../../constants/theme";
 import { getRecommendedRecipes } from "../../data/recipes";
-import "../../global.css";
 
 const RECOMMENDED_MEALS = getRecommendedRecipes();
 
@@ -32,39 +38,33 @@ export default function HomeScreen() {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View style={styles.container}>
       <Header title="MealSync" />
 
       <ScrollView
-        className="flex-1"
-        contentContainerStyle={{ paddingBottom: 40 }}
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollViewContent}
         showsVerticalScrollIndicator={false}
       >
         {/* Scan Ingredients Section */}
-        <View className="px-6 mb-8">
-          <Text className="text-2xl font-bold text-neutral-900 mb-4">
-            Scan Ingredients
-          </Text>
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>Scan Ingredients</Text>
 
-          <View className="flex-row gap-4">
+          <View style={styles.buttonsContainer}>
             <Pressable
-              className="flex-1 bg-primary-500 rounded-xl p-5 items-center justify-center shadow-sm"
+              style={[styles.button, styles.primaryButton]}
               onPress={takePhoto}
             >
-              <Text className="text-2xl mb-2">📷</Text>
-              <Text className="text-base font-medium text-white">
-                Take Photo
-              </Text>
+              <Text style={styles.buttonEmoji}>📷</Text>
+              <Text style={styles.buttonText}>Take Photo</Text>
             </Pressable>
 
             <Pressable
-              className="flex-1 bg-accent-500 rounded-xl p-5 items-center justify-center shadow-sm"
+              style={[styles.button, styles.accentButton]}
               onPress={() => router.push("/manual-input")}
             >
-              <Text className="text-2xl mb-2">✏️</Text>
-              <Text className="text-base font-medium text-white">
-                Manual Input
-              </Text>
+              <Text style={styles.buttonEmoji}>✏️</Text>
+              <Text style={styles.buttonText}>Manual Input</Text>
             </Pressable>
           </View>
         </View>
@@ -80,3 +80,62 @@ export default function HomeScreen() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.white,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollViewContent: {
+    paddingBottom: Spacing[10],
+  },
+  sectionContainer: {
+    paddingHorizontal: Spacing[6],
+    marginBottom: Spacing[8],
+  },
+  sectionTitle: {
+    fontSize: FontSizes["2xl"],
+    fontWeight: FontWeights.bold,
+    color: Colors.neutral[900],
+    marginBottom: Spacing[4],
+  },
+  buttonsContainer: {
+    flexDirection: "row",
+    gap: Spacing[4],
+  },
+  button: {
+    flex: 1,
+    borderRadius: BorderRadius.xl,
+    padding: Spacing[5],
+    alignItems: "center",
+    justifyContent: "center",
+    // Basic shadow for iOS
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    // Basic shadow for Android
+    elevation: 2,
+  },
+  primaryButton: {
+    backgroundColor: Colors.primary[500],
+  },
+  accentButton: {
+    backgroundColor: Colors.accent[500],
+  },
+  buttonEmoji: {
+    fontSize: FontSizes["2xl"],
+    marginBottom: Spacing[2],
+  },
+  buttonText: {
+    fontSize: FontSizes.base,
+    fontWeight: FontWeights.medium,
+    color: Colors.white,
+  },
+});

@@ -1,7 +1,14 @@
 import { Image } from "expo-image";
-import { Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 // @ts-expect-error: Metro provides asset module typing
 import appIcon from "../assets/images/logo.png";
+import {
+  BorderRadius,
+  Colors,
+  FontSizes,
+  FontWeights,
+  Spacing,
+} from "../constants/theme";
 
 interface HeaderProps {
   title: string;
@@ -9,30 +16,73 @@ interface HeaderProps {
 
 export function Header({ title }: HeaderProps) {
   return (
-    <View className="pt-14 pb-6 px-6 bg-white">
-      <View className="relative items-center justify-center">
-        {/* Centered Title */}
-        <Text className="text-2xl font-semibold text-neutral-900 text-center">
-          {title}
-        </Text>
-
+    <View style={styles.container}>
+      <View style={styles.innerContainer}>
         {/* Left Logo */}
-        <View className="absolute left-0 flex-row items-center">
+        <View style={styles.logoContainer}>
           <Image
             source={appIcon}
-            style={{ width: 32, height: 32, borderRadius: 16 }}
+            style={styles.logo}
             contentFit="cover"
             accessibilityLabel="App logo"
           />
         </View>
 
+        {/* Centered Title */}
+        <Text style={styles.title}>{title}</Text>
+
         {/* Right Settings */}
-        <View className="absolute right-0 flex-row items-center">
-          <View className="w-6 h-6 rounded-full bg-neutral-100 items-center justify-center">
-            <Text className="text-base">⚙️</Text>
+        <View style={styles.settingsContainer}>
+          <View style={styles.settingsIconWrapper}>
+            <Text style={styles.settingsIcon}>⚙️</Text>
           </View>
         </View>
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    paddingTop: 56, // pt-14
+    paddingBottom: Spacing[6],
+    paddingHorizontal: Spacing[6],
+    backgroundColor: Colors.white,
+  },
+  innerContainer: {
+    position: "relative",
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+  },
+  title: {
+    fontSize: FontSizes["2xl"],
+    fontWeight: FontWeights.semibold,
+    color: Colors.neutral[900],
+    textAlign: "center",
+  },
+  logoContainer: {
+    position: "absolute",
+    left: 0,
+  },
+  logo: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+  },
+  settingsContainer: {
+    position: "absolute",
+    right: 0,
+  },
+  settingsIconWrapper: {
+    width: 24,
+    height: 24,
+    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.neutral[100],
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  settingsIcon: {
+    fontSize: FontSizes.base,
+  },
+});

@@ -1,10 +1,16 @@
 import { Image } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Header } from "../../components/Header";
+import {
+  BorderRadius,
+  Colors,
+  FontSizes,
+  FontWeights,
+  Spacing,
+} from "../../constants/theme";
 import { getRecipeById, type Ingredient } from "../../data/recipes";
-import "../../global.css";
 
 export default function RecipeDetail() {
   const { id } = useLocalSearchParams();
@@ -36,60 +42,53 @@ export default function RecipeDetail() {
 
   if (!recipe) {
     return (
-      <View className="flex-1 bg-white items-center justify-center">
-        <Text className="text-lg text-neutral-500">Recipe not found</Text>
+      <View style={styles.notFoundContainer}>
+        <Text style={styles.notFoundText}>Recipe not found</Text>
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-white">
+    <View style={styles.container}>
       <Header title={recipe.title || "Recipe"} />
 
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Recipe Image */}
-        <Image
-          source={recipe.image}
-          className="w-full h-64"
-          contentFit="cover"
-        />
+        <Image source={recipe.image} style={styles.image} contentFit="cover" />
 
         {/* Recipe Content */}
-        <View className="p-6">
+        <View style={styles.contentContainer}>
           {/* Description */}
-          <Text className="text-lg text-neutral-600 mb-6 leading-6">
-            {recipe.description}
-          </Text>
+          <Text style={styles.description}>{recipe.description}</Text>
 
           {/* Ingredients Section */}
-          <View className="mb-8">
-            <Text className="text-2xl font-bold text-neutral-900 mb-4">
-              Ingredients
-            </Text>
-            <View className="space-y-3">
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Ingredients</Text>
+            <View>
               {ingredients.map((ingredient) => (
                 <Pressable
                   key={ingredient.id}
-                  className="flex-row items-center py-2"
+                  style={styles.ingredientRow}
                   onPress={() => toggleIngredient(ingredient.id)}
                 >
                   <View
-                    className={`w-6 h-6 rounded border-2 mr-3 items-center justify-center ${
-                      ingredient.checked
-                        ? "bg-primary-500 border-primary-500"
-                        : "border-neutral-300"
-                    }`}
+                    style={[
+                      styles.checkbox,
+                      ingredient.checked && styles.checkboxChecked,
+                    ]}
                   >
                     {ingredient.checked && (
-                      <Text className="text-white text-sm font-bold">✓</Text>
+                      <Text style={styles.checkboxCheck}>✓</Text>
                     )}
                   </View>
                   <Text
-                    className={`text-lg ${
-                      ingredient.checked
-                        ? "text-neutral-500 line-through"
-                        : "text-neutral-900"
-                    }`}
+                    style={[
+                      styles.ingredientText,
+                      ingredient.checked && styles.ingredientTextChecked,
+                    ]}
                   >
                     {ingredient.text}
                   </Text>
@@ -99,19 +98,15 @@ export default function RecipeDetail() {
           </View>
 
           {/* Instructions Section */}
-          <View className="mb-8">
-            <Text className="text-2xl font-bold text-neutral-900 mb-4">
-              Instructions
-            </Text>
-            <View className="space-y-4">
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Instructions</Text>
+            <View style={{ gap: Spacing[4] }}>
               {recipe.instructions.map((instruction, index) => (
-                <View key={index} className="flex-row">
-                  <View className="w-8 h-8 bg-primary-500 rounded-full items-center justify-center mr-4 flex-shrink-0">
-                    <Text className="text-white font-bold text-sm">
-                      {index + 1}
-                    </Text>
+                <View key={index} style={styles.instructionRow}>
+                  <View style={styles.instructionStep}>
+                    <Text style={styles.instructionStepText}>{index + 1}</Text>
                   </View>
-                  <Text className="text-lg text-neutral-700 flex-1 leading-6">
+                  <Text style={styles.instructionText}>
                     {typeof instruction === "string"
                       ? instruction
                       : instruction.text}
@@ -124,14 +119,132 @@ export default function RecipeDetail() {
       </ScrollView>
 
       {/* Save Button */}
-      <View className="p-6 bg-white border-t border-neutral-200">
-        <Pressable
-          className="bg-primary-500 rounded-xl p-4 items-center shadow-sm"
-          onPress={saveRecipe}
-        >
-          <Text className="text-white font-semibold text-lg">Save Recipe</Text>
+      <View style={styles.footer}>
+        <Pressable style={styles.saveButton} onPress={saveRecipe}>
+          <Text style={styles.saveButtonText}>Save Recipe</Text>
         </Pressable>
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.white,
+  },
+  notFoundContainer: {
+    flex: 1,
+    backgroundColor: Colors.white,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  notFoundText: {
+    fontSize: FontSizes.lg,
+    color: Colors.neutral[500],
+  },
+  scrollView: {
+    flex: 1,
+  },
+  image: {
+    width: "100%",
+    height: 256,
+  },
+  contentContainer: {
+    padding: Spacing[6],
+  },
+  description: {
+    fontSize: FontSizes.lg,
+    color: Colors.neutral[600],
+    marginBottom: Spacing[6],
+    lineHeight: 24,
+  },
+  section: {
+    marginBottom: Spacing[8],
+  },
+  sectionTitle: {
+    fontSize: FontSizes["2xl"],
+    fontWeight: FontWeights.bold,
+    color: Colors.neutral[900],
+    marginBottom: Spacing[4],
+  },
+  ingredientRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: Spacing[2],
+    gap: Spacing[3],
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: BorderRadius.sm,
+    borderWidth: 2,
+    borderColor: Colors.neutral[300],
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  checkboxChecked: {
+    backgroundColor: Colors.primary[500],
+    borderColor: Colors.primary[500],
+  },
+  checkboxCheck: {
+    color: Colors.white,
+    fontSize: FontSizes.sm,
+    fontWeight: FontWeights.bold,
+  },
+  ingredientText: {
+    fontSize: FontSizes.lg,
+    color: Colors.neutral[900],
+  },
+  ingredientTextChecked: {
+    color: Colors.neutral[500],
+    textDecorationLine: "line-through",
+  },
+  instructionRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: Spacing[4],
+  },
+  instructionStep: {
+    width: 32,
+    height: 32,
+    backgroundColor: Colors.primary[500],
+    borderRadius: BorderRadius.full,
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  instructionStepText: {
+    color: Colors.white,
+    fontWeight: FontWeights.bold,
+    fontSize: FontSizes.sm,
+  },
+  instructionText: {
+    fontSize: FontSizes.lg,
+    color: Colors.neutral[700],
+    flex: 1,
+    lineHeight: 24,
+  },
+  footer: {
+    padding: Spacing[6],
+    backgroundColor: Colors.white,
+    borderTopWidth: 1,
+    borderColor: Colors.neutral[200],
+  },
+  saveButton: {
+    backgroundColor: Colors.primary[500],
+    borderRadius: BorderRadius.xl,
+    padding: Spacing[4],
+    alignItems: "center",
+    shadowColor: Colors.black,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
+  },
+  saveButtonText: {
+    color: Colors.white,
+    fontWeight: FontWeights.semibold,
+    fontSize: FontSizes.lg,
+  },
+});
