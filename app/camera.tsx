@@ -1,8 +1,15 @@
-import { Camera, CameraView } from "expo-camera";
-import { Image } from "expo-image";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Alert, Animated, Pressable, Text, View } from "react-native";
+import {
+  Alert,
+  Animated,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import "../global.css";
 
 export default function CameraScreen() {
@@ -11,15 +18,15 @@ export default function CameraScreen() {
   const [photo, setPhoto] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [permission, requestPermission] = useCameraPermissions();
   const rotateAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === "granted");
-    })();
-  }, []);
+    // We only need to request permission if it's not determined yet.
+    if (permission && !permission.granted && permission.canAskAgain) {
+      requestPermission();
+    }
+  }, [permission, requestPermission]);
 
   const startScanning = () => {
     setProcessing(true);
@@ -63,36 +70,56 @@ export default function CameraScreen() {
     if (cameraRef.current) {
       try {
         const result = await cameraRef.current.takePictureAsync();
+
         if (result?.uri) {
           setPhoto(result.uri);
           setTimeout(() => startScanning(), 500);
         } else {
-          Alert.alert("Error", "No photo URI received");
+          Alert.alert("Error", "No photo URI received from camera result.");
         }
       } catch (error) {
-        Alert.alert("Error", "Failed to take photo");
+        let message = "An unknown error occurred.";
+        if (error instanceof Error) {
+          message = error.message;
+        }
+        Alert.alert("Error", `Failed to take photo: ${message}`);
       }
+    } else {
+      Alert.alert("Error", "Camera reference is not available.");
     }
   };
 
-  const retakePhoto = () => setPhoto(null);
+  const retakePhoto = () => {
+    setPhoto(null);
+    // It's good practice to reset the animation value as well
+    rotateAnim.setValue(0);
+  };
 
-  if (hasPermission === null) {
+  if (!permission) {
+    // Camera permissions are still loading.
     return (
       <View className="flex-1 bg-black items-center justify-center">
-        <Text className="text-white text-lg">
-          Requesting camera permission...
-        </Text>
+        <Text className="text-white text-lg">Loading Camera...</Text>
       </View>
     );
   }
 
-  if (hasPermission === false) {
+  if (!permission.granted) {
+    // Camera permissions are not granted yet.
     return (
-      <View className="flex-1 bg-black items-center justify-center">
-        <Text className="text-white text-lg mb-4">No access to camera</Text>
+      <View className="flex-1 bg-black items-center justify-center p-6">
+        <Text className="text-white text-lg text-center mb-4">
+          We need your permission to show the camera. Please grant permission in
+          your device settings.
+        </Text>
         <Pressable
-          className="bg-blue-500 px-6 py-3 rounded-lg"
+          className="bg-blue-500 px-6 py-3 rounded-lg mb-4"
+          onPress={requestPermission}
+        >
+          <Text className="text-white font-semibold">Grant Permission</Text>
+        </Pressable>
+        <Pressable
+          className="bg-neutral-600 px-6 py-3 rounded-lg"
           onPress={() => router.back()}
         >
           <Text className="text-white font-semibold">Go Back</Text>
@@ -111,40 +138,53 @@ export default function CameraScreen() {
       <View className="flex-1 bg-white">
         {/* Header */}
         <View className="pt-14 pb-6 px-6">
-          <Pressable onPress={() => router.back()}>
-            <Text className="text-lg text-primary-600">✕ Close</Text>
+          <Pressable onPress={retakePhoto}>
+            <Text className="text-lg text-primary-600">✕ Retake</Text>
           </Pressable>
         </View>
 
         {/* Photo Container */}
-        <View className="flex-1 items-center justify-center">
-          <View className="relative">
-            <View className="w-72 h-72 rounded-full overflow-hidden bg-neutral-100 border-2 border-neutral-200 z-10">
-              <Image
-                source={{ uri: photo }}
-                className="w-full h-full"
-                contentFit="cover"
-              />
-            </View>
-
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <View style={{ width: 304, height: 304 }}>
             {processing && (
               <Animated.View
                 style={{
                   position: "absolute",
-                  width: 320,
-                  height: 320,
-                  borderRadius: 160,
+                  width: 304,
+                  height: 304,
+                  borderRadius: 152,
                   borderWidth: 4,
                   borderColor: "transparent",
                   borderTopColor: "#10b981",
                   borderRightColor: "#10b981",
-                  top: -10,
-                  left: -10,
                   zIndex: 20,
                   transform: [{ rotate: spin }],
                 }}
               />
             )}
+            <View
+              style={{
+                position: "absolute",
+                top: 8,
+                left: 8,
+                width: 288,
+                height: 288,
+                borderRadius: 144,
+                overflow: "hidden",
+                backgroundColor: "#f5f5f5",
+                borderWidth: 2,
+                borderColor: "#e5e5e5",
+                zIndex: 10,
+              }}
+            >
+              <Image
+                source={{ uri: photo }}
+                style={{ width: "100%", height: "100%" }}
+                resizeMode="cover"
+              />
+            </View>
           </View>
 
           {processing && (
@@ -162,11 +202,11 @@ export default function CameraScreen() {
         {!processing && (
           <View className="p-6">
             <Pressable
-              className="bg-neutral-500 rounded-2xl p-4 items-center shadow-sm"
-              onPress={retakePhoto}
+              className="bg-accent-500 rounded-2xl p-4 items-center shadow-sm"
+              onPress={startScanning}
             >
               <Text className="text-white font-semibold text-lg">
-                Retake Photo
+                Use Photo
               </Text>
             </Pressable>
           </View>
@@ -177,7 +217,12 @@ export default function CameraScreen() {
 
   return (
     <View className="flex-1 bg-black">
-      <CameraView ref={cameraRef} className="flex-1" facing="back" />
+      <CameraView
+        className="flex-1"
+        style={StyleSheet.absoluteFillObject}
+        ref={cameraRef}
+        facing="back"
+      />
 
       {/* Header */}
       <View className="absolute top-0 left-0 right-0 pt-14 pb-4 px-6">
