@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   },
   title: {
     marginTop: Spacing[3],
-    fontSize: FontSizes.xl,
+    fontSize: FontSizes.lg,
     fontWeight: FontWeights.semibold,
     fontFamily: Fonts.semibold,
     color: Colors.neutral[900],
@@ -86,13 +86,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   rating: {
-    fontSize: FontSizes.base,
+    fontSize: FontSizes.sm,
     fontFamily: Fonts.medium,
     color: Colors.neutral[700],
     marginRight: Spacing[2],
   },
   tag: {
-    fontSize: FontSizes.base,
+    fontSize: FontSizes.sm,
     fontFamily: Fonts.regular,
     color: Colors.neutral[500],
   },
