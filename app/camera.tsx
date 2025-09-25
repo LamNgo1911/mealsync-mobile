@@ -10,6 +10,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { Header } from "../components/Header";
 import {
   BorderRadius,
   Colors,
@@ -204,12 +205,7 @@ export default function CameraScreen() {
         facing="back"
       />
 
-      {/* Header */}
-      <View style={styles.cameraHeader}>
-        <Pressable style={styles.closeButton} onPress={() => router.back()}>
-          <Text style={styles.closeButtonText}>✕</Text>
-        </Pressable>
-      </View>
+      <Header title="Scan" showBackButton />
 
       {/* Bottom Controls */}
       <View style={styles.controlsContainer}>

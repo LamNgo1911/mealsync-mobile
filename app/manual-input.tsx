@@ -8,6 +8,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { Header } from "../components/Header";
 import {
   BorderRadius,
   Colors,
@@ -55,20 +56,7 @@ export default function ManualInputScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerInner}>
-          <Pressable onPress={() => router.back()}>
-            <Text style={styles.headerButtonText}>Cancel</Text>
-          </Pressable>
-          <Text style={styles.headerTitle}>Manual Input</Text>
-          <Pressable onPress={findRecipes}>
-            <Text style={[styles.headerButtonText, styles.headerDoneButton]}>
-              Done
-            </Text>
-          </Pressable>
-        </View>
-      </View>
+      <Header title="Manual Input" showBackButton />
 
       {/* Input Section */}
       <View style={styles.inputSection}>

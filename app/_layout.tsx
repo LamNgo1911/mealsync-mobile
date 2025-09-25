@@ -36,7 +36,7 @@ export default function RootLayout() {
 
   return (
     <>
-      <Redirect href="/(tabs)/home" />
+      <Redirect href="/(auth)/login" />
       <Stack screenOptions={{ headerShown: false }} />
     </>
   );

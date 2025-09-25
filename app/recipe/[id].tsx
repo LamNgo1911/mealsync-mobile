@@ -1,7 +1,14 @@
 import { Image } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { Header } from "../../components/Header";
 import {
   BorderRadius,
@@ -42,8 +49,11 @@ export default function RecipeDetail() {
   };
 
   const saveRecipe = () => {
-    // TODO: Implement save functionality
-    console.log("Recipe saved!");
+    // TODO: Implement actual save functionality
+    Alert.alert(
+      "Recipe Saved",
+      "This recipe has been added to your collection."
+    );
   };
 
   if (!recipe) {
@@ -56,7 +66,7 @@ export default function RecipeDetail() {
 
   return (
     <View style={styles.container}>
-      <Header title={recipe.name || "Recipe"} />
+      <Header title={recipe.name || "Recipe"} showBackButton />
 
       <ScrollView
         style={styles.scrollView}

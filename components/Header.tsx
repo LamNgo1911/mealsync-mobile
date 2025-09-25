@@ -1,5 +1,5 @@
-import { Image } from "expo-image";
-import { StyleSheet, Text, View } from "react-native";
+import { useRouter } from "expo-router";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 // @ts-expect-error: Metro provides asset module typing
 import appIcon from "../assets/images/logo.png";
 import {
@@ -13,24 +13,34 @@ import {
 
 interface HeaderProps {
   title: string;
+  showBackButton?: boolean;
 }
 
-export function Header({ title }: HeaderProps) {
+export function Header({ title, showBackButton = false }: HeaderProps) {
+  const router = useRouter();
+
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
-        {/* Left Logo */}
-        <View style={styles.logoContainer}>
-          <Image
-            source={appIcon}
-            style={styles.logo}
-            contentFit="cover"
-            accessibilityLabel="App logo"
-          />
+        {/* Left Icon */}
+        <View style={styles.iconContainer}>
+          {showBackButton ? (
+            <Pressable onPress={() => router.back()}>
+              <Text style={styles.backButton}>‹</Text>
+            </Pressable>
+          ) : (
+            <Image
+              source={appIcon}
+              style={styles.logo}
+              accessibilityLabel="App logo"
+            />
+          )}
         </View>
 
         {/* Centered Title */}
-        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.title} numberOfLines={1}>
+          {title}
+        </Text>
       </View>
     </View>
   );
@@ -56,14 +66,22 @@ const styles = StyleSheet.create({
     color: Colors.neutral[900],
     textAlign: "center",
   },
-  logoContainer: {
+  iconContainer: {
     position: "absolute",
     left: 0,
+    // Center the icon vertically in the header
+    top: 0,
+    bottom: 0,
+    justifyContent: "center",
   },
   logo: {
     width: 32,
     height: 32,
     borderRadius: 16,
+  },
+  backButton: {
+    fontSize: FontSizes["3xl"],
+    color: Colors.neutral[800],
   },
   settingsContainer: {
     position: "absolute",
