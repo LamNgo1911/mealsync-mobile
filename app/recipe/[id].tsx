@@ -12,12 +12,12 @@ import {
 import { Header } from "../../components/Header";
 import {
   BorderRadius,
-  Colors,
   Fonts,
   FontSizes,
   FontWeights,
   Spacing,
 } from "../../constants/theme";
+import { useTheme } from "../../context/ThemeContext";
 import { getRecipeById, RecipeIngredient } from "../../data/recipes";
 
 // Client-side state for checkboxes
@@ -25,6 +25,7 @@ type IngredientState = RecipeIngredient & { checked: boolean };
 
 export default function RecipeDetail() {
   const { id } = useLocalSearchParams();
+  const { colors } = useTheme();
   const [ingredients, setIngredients] = useState<IngredientState[]>([]);
 
   const recipe = getRecipeById(id as string);
@@ -58,14 +59,18 @@ export default function RecipeDetail() {
 
   if (!recipe) {
     return (
-      <View style={styles.notFoundContainer}>
-        <Text style={styles.notFoundText}>Recipe not found</Text>
+      <View
+        style={[styles.notFoundContainer, { backgroundColor: colors.white }]}
+      >
+        <Text style={[styles.notFoundText, { color: colors.neutral[500] }]}>
+          Recipe not found
+        </Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.white }]}>
       <Header title={recipe.name || "Recipe"} showBackButton />
 
       <ScrollView
@@ -82,11 +87,15 @@ export default function RecipeDetail() {
         {/* Recipe Content */}
         <View style={styles.contentContainer}>
           {/* Description */}
-          <Text style={styles.description}>{recipe.description}</Text>
+          <Text style={[styles.description, { color: colors.neutral[600] }]}>
+            {recipe.description}
+          </Text>
 
           {/* Ingredients Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Ingredients</Text>
+            <Text style={[styles.sectionTitle, { color: colors.neutral[900] }]}>
+              Ingredients
+            </Text>
             <View>
               {ingredients.map((ingredient) => (
                 <Pressable
@@ -97,17 +106,29 @@ export default function RecipeDetail() {
                   <View
                     style={[
                       styles.checkbox,
-                      ingredient.checked && styles.checkboxChecked,
+                      { borderColor: colors.neutral[300] },
+                      ingredient.checked && {
+                        backgroundColor: colors.primary[500],
+                        borderColor: colors.primary[500],
+                      },
                     ]}
                   >
                     {ingredient.checked && (
-                      <Text style={styles.checkboxCheck}>✓</Text>
+                      <Text
+                        style={[styles.checkboxCheck, { color: colors.white }]}
+                      >
+                        ✓
+                      </Text>
                     )}
                   </View>
                   <Text
                     style={[
                       styles.ingredientText,
-                      ingredient.checked && styles.ingredientTextChecked,
+                      { color: colors.neutral[900] },
+                      ingredient.checked && {
+                        color: colors.neutral[500],
+                        textDecorationLine: "line-through",
+                      },
                     ]}
                   >
                     {`${ingredient.quantity} ${ingredient.unit} ${ingredient.name}`}
@@ -119,14 +140,35 @@ export default function RecipeDetail() {
 
           {/* Instructions Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Instructions</Text>
+            <Text style={[styles.sectionTitle, { color: colors.neutral[900] }]}>
+              Instructions
+            </Text>
             <View style={{ gap: Spacing[4] }}>
               {recipe.instructions.map((instruction, index) => (
                 <View key={index} style={styles.instructionRow}>
-                  <View style={styles.instructionStep}>
-                    <Text style={styles.instructionStepText}>{index + 1}</Text>
+                  <View
+                    style={[
+                      styles.instructionStep,
+                      { backgroundColor: colors.primary[500] },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.instructionStepText,
+                        { color: colors.white },
+                      ]}
+                    >
+                      {index + 1}
+                    </Text>
                   </View>
-                  <Text style={styles.instructionText}>{instruction}</Text>
+                  <Text
+                    style={[
+                      styles.instructionText,
+                      { color: colors.neutral[700] },
+                    ]}
+                  >
+                    {instruction}
+                  </Text>
                 </View>
               ))}
             </View>
@@ -135,9 +177,25 @@ export default function RecipeDetail() {
       </ScrollView>
 
       {/* Save Button */}
-      <View style={styles.footer}>
-        <Pressable style={styles.saveButton} onPress={saveRecipe}>
-          <Text style={styles.saveButtonText}>Save Recipe</Text>
+      <View
+        style={[
+          styles.footer,
+          {
+            backgroundColor: colors.white,
+            borderColor: colors.neutral[200],
+          },
+        ]}
+      >
+        <Pressable
+          style={[
+            styles.saveButton,
+            { backgroundColor: colors.primary[500], shadowColor: colors.black },
+          ]}
+          onPress={saveRecipe}
+        >
+          <Text style={[styles.saveButtonText, { color: colors.white }]}>
+            Save Recipe
+          </Text>
         </Pressable>
       </View>
     </View>
@@ -147,18 +205,15 @@ export default function RecipeDetail() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.white,
   },
   notFoundContainer: {
     flex: 1,
-    backgroundColor: Colors.white,
     alignItems: "center",
     justifyContent: "center",
   },
   notFoundText: {
     fontSize: FontSizes.lg,
     fontFamily: Fonts.regular,
-    color: Colors.neutral[500],
   },
   scrollView: {
     flex: 1,
@@ -173,7 +228,6 @@ const styles = StyleSheet.create({
   description: {
     fontSize: FontSizes.lg,
     fontFamily: Fonts.regular,
-    color: Colors.neutral[600],
     marginBottom: Spacing[6],
     lineHeight: 24,
   },
@@ -184,7 +238,6 @@ const styles = StyleSheet.create({
     fontSize: FontSizes["2xl"],
     fontWeight: FontWeights.bold,
     fontFamily: Fonts.bold,
-    color: Colors.neutral[900],
     marginBottom: Spacing[4],
   },
   ingredientRow: {
@@ -198,16 +251,11 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: BorderRadius.sm,
     borderWidth: 2,
-    borderColor: Colors.neutral[300],
     alignItems: "center",
     justifyContent: "center",
   },
-  checkboxChecked: {
-    backgroundColor: Colors.primary[500],
-    borderColor: Colors.primary[500],
-  },
+  checkboxChecked: {},
   checkboxCheck: {
-    color: Colors.white,
     fontSize: FontSizes.sm,
     fontWeight: FontWeights.bold,
     fontFamily: Fonts.bold,
@@ -215,12 +263,8 @@ const styles = StyleSheet.create({
   ingredientText: {
     fontSize: FontSizes.lg,
     fontFamily: Fonts.regular,
-    color: Colors.neutral[900],
   },
-  ingredientTextChecked: {
-    color: Colors.neutral[500],
-    textDecorationLine: "line-through",
-  },
+  ingredientTextChecked: {},
   instructionRow: {
     flexDirection: "row",
     alignItems: "flex-start",
@@ -229,14 +273,12 @@ const styles = StyleSheet.create({
   instructionStep: {
     width: 32,
     height: 32,
-    backgroundColor: Colors.primary[500],
     borderRadius: BorderRadius.full,
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
   },
   instructionStepText: {
-    color: Colors.white,
     fontWeight: FontWeights.bold,
     fontSize: FontSizes.sm,
     fontFamily: Fonts.bold,
@@ -244,29 +286,23 @@ const styles = StyleSheet.create({
   instructionText: {
     fontSize: FontSizes.lg,
     fontFamily: Fonts.regular,
-    color: Colors.neutral[700],
     flex: 1,
     lineHeight: 24,
   },
   footer: {
     padding: Spacing[6],
-    backgroundColor: Colors.white,
     borderTopWidth: 1,
-    borderColor: Colors.neutral[200],
   },
   saveButton: {
-    backgroundColor: Colors.primary[500],
     borderRadius: BorderRadius.xl,
     padding: Spacing[4],
     alignItems: "center",
-    shadowColor: Colors.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
     elevation: 2,
   },
   saveButtonText: {
-    color: Colors.white,
     fontWeight: FontWeights.semibold,
     fontFamily: Fonts.semibold,
     fontSize: FontSizes.lg,

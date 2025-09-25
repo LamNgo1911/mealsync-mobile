@@ -4,13 +4,8 @@ import { FlatList, StyleSheet, TextInput, View } from "react-native";
 import { Header } from "../../components/Header";
 import { RecipeCard } from "../../components/RecipeCard";
 import { SkeletonCard } from "../../components/SkeletonCard";
-import {
-  BorderRadius,
-  Colors,
-  FontSizes,
-  Fonts,
-  Spacing,
-} from "../../constants/theme";
+import { BorderRadius, Fonts, FontSizes, Spacing } from "../../constants/theme";
+import { useTheme } from "../../context/ThemeContext";
 import { getExploreRecipes } from "../../data/recipes";
 
 type Recipe = {
@@ -26,6 +21,7 @@ const MOCK_RECIPES = getExploreRecipes();
 
 export default function ExploreScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -44,18 +40,20 @@ export default function ExploreScreen() {
   }, [query]);
 
   return (
-    <View style={styles.container}>
-      <Header title="Explore" />
+    <View style={[styles.container, { backgroundColor: colors.white }]}>
+      <Header />
 
       {/* Search Box */}
       <View style={styles.searchContainer}>
-        <View style={styles.searchBox}>
+        <View
+          style={[styles.searchBox, { backgroundColor: colors.neutral[100] }]}
+        >
           <TextInput
             placeholder="Search recipes"
             value={query}
             onChangeText={setQuery}
-            style={styles.searchInput}
-            placeholderTextColor={Colors.neutral[400]}
+            style={[styles.searchInput, { color: colors.neutral[700] }]}
+            placeholderTextColor={colors.neutral[400]}
           />
         </View>
       </View>
@@ -108,7 +106,6 @@ export default function ExploreScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.white,
   },
   searchContainer: {
     paddingHorizontal: Spacing[6],
@@ -116,7 +113,6 @@ const styles = StyleSheet.create({
   },
   searchBox: {
     borderRadius: BorderRadius["2xl"],
-    backgroundColor: Colors.neutral[100],
     paddingHorizontal: 20, // px-5
     height: 56, // h-14
     justifyContent: "center",
@@ -124,7 +120,6 @@ const styles = StyleSheet.create({
   searchInput: {
     fontSize: FontSizes.lg,
     fontFamily: Fonts.regular,
-    color: Colors.neutral[700],
     height: "100%",
   },
   listContentContainer: {

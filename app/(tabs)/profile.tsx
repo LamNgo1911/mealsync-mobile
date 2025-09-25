@@ -3,20 +3,21 @@ import { Header } from "../../components/Header";
 import { RecipeSection } from "../../components/RecipeSection";
 import {
   BorderRadius,
-  Colors,
   Fonts,
   FontSizes,
   FontWeights,
   Spacing,
 } from "../../constants/theme";
+import { useTheme } from "../../context/ThemeContext";
 import { getSavedRecipes } from "../../data/recipes";
 
 const SAVED_RECIPES = getSavedRecipes();
 
 export default function ProfileScreen() {
+  const { colors } = useTheme();
   return (
-    <View style={styles.container}>
-      <Header title="Profile" />
+    <View style={[styles.container, { backgroundColor: colors.white }]}>
+      <Header />
 
       <ScrollView
         contentContainerStyle={styles.scrollViewContent}
@@ -25,15 +26,31 @@ export default function ProfileScreen() {
         {/* Profile Section */}
         <View style={styles.profileSection}>
           {/* Profile Image */}
-          <View style={styles.avatarOuter}>
-            <View style={styles.avatarInner}>
-              <Text style={styles.avatarEmoji}>👤</Text>
+          <View
+            style={[
+              styles.avatarOuter,
+              { backgroundColor: colors.accent[300] },
+            ]}
+          >
+            <View
+              style={[
+                styles.avatarInner,
+                { backgroundColor: colors.accent[400] },
+              ]}
+            >
+              <Text style={[styles.avatarEmoji, { color: colors.accent[900] }]}>
+                👤
+              </Text>
             </View>
           </View>
 
           {/* User Info */}
-          <Text style={styles.userName}>Ethan Carter</Text>
-          <Text style={styles.userBio}>Foodie & Recipe Explorer</Text>
+          <Text style={[styles.userName, { color: colors.neutral[900] }]}>
+            Ethan Carter
+          </Text>
+          <Text style={[styles.userBio, { color: colors.info }]}>
+            Foodie & Recipe Explorer
+          </Text>
         </View>
 
         <RecipeSection
@@ -49,7 +66,6 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.white,
   },
   scrollViewContent: {
     paddingBottom: Spacing[10],
@@ -63,7 +79,6 @@ const styles = StyleSheet.create({
     width: 128,
     height: 128,
     borderRadius: BorderRadius.full,
-    backgroundColor: Colors.accent[300], // Approximation of yellow-400
     marginBottom: Spacing[5],
     alignItems: "center",
     justifyContent: "center",
@@ -72,25 +87,21 @@ const styles = StyleSheet.create({
     width: 96,
     height: 96,
     borderRadius: BorderRadius.full,
-    backgroundColor: Colors.accent[400], // Approximation of yellow-500
     alignItems: "center",
     justifyContent: "center",
   },
   avatarEmoji: {
     fontSize: 48, // Approximation of text-4xl
-    color: Colors.accent[900], // Approximation of orange-900
   },
   userName: {
     fontSize: FontSizes["2xl"],
     fontWeight: FontWeights.bold,
     fontFamily: Fonts.bold,
-    color: Colors.neutral[900], // Approximation of slate-900
     marginBottom: Spacing[2],
   },
   userBio: {
     fontSize: FontSizes.lg,
     fontFamily: Fonts.regular,
-    color: Colors.info, // Approximation of blue-600
     marginBottom: Spacing[6],
   },
 });

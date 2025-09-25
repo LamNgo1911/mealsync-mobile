@@ -1,12 +1,14 @@
 import { useEffect, useRef } from "react";
 import { Animated, StyleSheet, View, ViewStyle } from "react-native";
-import { BorderRadius, Colors, Spacing } from "../constants/theme";
+import { BorderRadius, Spacing } from "../constants/theme";
+import { useTheme } from "../context/ThemeContext";
 
 export type SkeletonCardProps = {
   containerStyle?: ViewStyle;
 };
 
 export function SkeletonCard({ containerStyle }: SkeletonCardProps) {
+  const { colors } = useTheme();
   const opacity = useRef(new Animated.Value(0.5)).current;
 
   useEffect(() => {
@@ -30,9 +32,24 @@ export function SkeletonCard({ containerStyle }: SkeletonCardProps) {
 
   return (
     <View style={containerStyle}>
-      <Animated.View style={[styles.image, { opacity }]} />
-      <Animated.View style={[styles.title, { opacity }]} />
-      <Animated.View style={[styles.subtitle, { opacity }]} />
+      <Animated.View
+        style={[
+          styles.image,
+          { opacity, backgroundColor: colors.neutral[200] },
+        ]}
+      />
+      <Animated.View
+        style={[
+          styles.title,
+          { opacity, backgroundColor: colors.neutral[200] },
+        ]}
+      />
+      <Animated.View
+        style={[
+          styles.subtitle,
+          { opacity, backgroundColor: colors.neutral[200] },
+        ]}
+      />
     </View>
   );
 }
@@ -42,19 +59,16 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 192,
     borderRadius: BorderRadius["2xl"],
-    backgroundColor: Colors.neutral[200],
   },
   title: {
     marginTop: Spacing[3],
     height: 22,
     borderRadius: BorderRadius.md,
-    backgroundColor: Colors.neutral[200],
   },
   subtitle: {
     marginTop: Spacing[2],
     height: 18,
     width: "60%",
     borderRadius: BorderRadius.md,
-    backgroundColor: Colors.neutral[200],
   },
 });

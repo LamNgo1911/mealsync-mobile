@@ -6,9 +6,11 @@ import {
   useFonts,
 } from "@expo-google-fonts/inter";
 import { PlayfairDisplay_700Bold } from "@expo-google-fonts/playfair-display";
-import { Redirect, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import { AuthProvider } from "../context/AuthContext";
+import { ThemeProvider, useTheme } from "../context/ThemeContext";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -35,9 +37,22 @@ export default function RootLayout() {
   }
 
   return (
-    <>
-      <Redirect href="/(auth)/login" />
-      <Stack screenOptions={{ headerShown: false }} />
-    </>
+    <ThemeProvider>
+      <AuthProvider>
+        <RootLayoutNav />
+      </AuthProvider>
+    </ThemeProvider>
+  );
+}
+
+function RootLayoutNav() {
+  const { colors } = useTheme();
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: colors.white },
+      }}
+    />
   );
 }

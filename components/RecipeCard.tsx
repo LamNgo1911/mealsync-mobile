@@ -3,12 +3,12 @@ import { memo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import {
   BorderRadius,
-  Colors,
   Fonts,
   FontSizes,
   FontWeights,
   Spacing,
 } from "../constants/theme";
+import { useTheme } from "../context/ThemeContext";
 
 export type RecipeCardProps = {
   id: string;
@@ -27,6 +27,7 @@ function RecipeCardComponent({
   tags,
   onPress,
 }: RecipeCardProps) {
+  const { colors } = useTheme();
   const source = typeof imageUrl === "string" ? { uri: imageUrl } : imageUrl;
   return (
     <Pressable
@@ -35,7 +36,7 @@ function RecipeCardComponent({
       accessibilityRole="button"
       accessibilityLabel={name}
     >
-      <View style={styles.imageContainer}>
+      <View style={[styles.imageContainer, { backgroundColor: colors.white }]}>
         <Image
           source={source}
           contentFit="cover"
@@ -43,15 +44,22 @@ function RecipeCardComponent({
           transition={150}
         />
       </View>
-      <Text style={styles.title} numberOfLines={2}>
+      <Text
+        style={[styles.title, { color: colors.neutral[900] }]}
+        numberOfLines={2}
+      >
         {name}
       </Text>
       <View style={styles.detailsContainer}>
         {typeof rating === "number" && (
-          <Text style={styles.rating}>{rating.toFixed(1)}</Text>
+          <Text style={[styles.rating, { color: colors.neutral[700] }]}>
+            {rating.toFixed(1)}
+          </Text>
         )}
         {tags && tags.length > 0 ? (
-          <Text style={styles.tag}>• {tags[0]}</Text>
+          <Text style={[styles.tag, { color: colors.neutral[500] }]}>
+            • {tags[0]}
+          </Text>
         ) : null}
       </View>
     </Pressable>
@@ -67,7 +75,6 @@ const styles = StyleSheet.create({
   imageContainer: {
     borderRadius: BorderRadius["2xl"],
     overflow: "hidden",
-    backgroundColor: Colors.white,
   },
   image: {
     width: "100%",
@@ -78,7 +85,6 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.lg,
     fontWeight: FontWeights.semibold,
     fontFamily: Fonts.semibold,
-    color: Colors.neutral[900],
   },
   detailsContainer: {
     marginTop: Spacing[2],
@@ -88,12 +94,10 @@ const styles = StyleSheet.create({
   rating: {
     fontSize: FontSizes.sm,
     fontFamily: Fonts.medium,
-    color: Colors.neutral[700],
     marginRight: Spacing[2],
   },
   tag: {
-    fontSize: FontSizes.sm,
+    fontSize: FontSizes.base,
     fontFamily: Fonts.regular,
-    color: Colors.neutral[500],
   },
 });

@@ -6,18 +6,19 @@ import { Header } from "../../components/Header";
 import { RecipeSection } from "../../components/RecipeSection";
 import {
   BorderRadius,
-  Colors,
   Fonts,
   FontSizes,
   FontWeights,
   Spacing,
 } from "../../constants/theme";
+import { useTheme } from "../../context/ThemeContext";
 import { getRecommendedRecipes } from "../../data/recipes";
 
 const RECOMMENDED_MEALS = getRecommendedRecipes();
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,8 +40,8 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Header title="MealSync" />
+    <View style={[styles.container, { backgroundColor: colors.white }]}>
+      <Header title="" />
 
       <ScrollView
         style={styles.scrollView}
@@ -49,23 +50,43 @@ export default function HomeScreen() {
       >
         {/* Scan Ingredients Section */}
         <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Scan Ingredients</Text>
+          <Text style={[styles.sectionTitle, { color: colors.neutral[900] }]}>
+            Scan Ingredients
+          </Text>
 
           <View style={styles.buttonsContainer}>
             <Pressable
-              style={[styles.button, styles.primaryButton]}
+              style={[
+                styles.button,
+                styles.primaryButton,
+                {
+                  backgroundColor: colors.primary[500],
+                  shadowColor: colors.black,
+                },
+              ]}
               onPress={takePhoto}
             >
               <Text style={styles.buttonEmoji}>📷</Text>
-              <Text style={styles.buttonText}>Take Photo</Text>
+              <Text style={[styles.buttonText, { color: colors.white }]}>
+                Take Photo
+              </Text>
             </Pressable>
 
             <Pressable
-              style={[styles.button, styles.accentButton]}
+              style={[
+                styles.button,
+                styles.accentButton,
+                {
+                  backgroundColor: colors.accent[500],
+                  shadowColor: colors.black,
+                },
+              ]}
               onPress={() => router.push("/manual-input")}
             >
               <Text style={styles.buttonEmoji}>✏️</Text>
-              <Text style={styles.buttonText}>Manual Input</Text>
+              <Text style={[styles.buttonText, { color: colors.white }]}>
+                Manual Input
+              </Text>
             </Pressable>
           </View>
         </View>
@@ -85,7 +106,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.white,
   },
   scrollView: {
     flex: 1,
@@ -101,7 +121,6 @@ const styles = StyleSheet.create({
     fontSize: FontSizes["2xl"],
     fontWeight: FontWeights.bold,
     fontFamily: Fonts.bold,
-    color: Colors.neutral[900],
     marginBottom: Spacing[4],
   },
   buttonsContainer: {
@@ -115,7 +134,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     // Basic shadow for iOS
-    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 1,
@@ -125,12 +143,8 @@ const styles = StyleSheet.create({
     // Basic shadow for Android
     elevation: 2,
   },
-  primaryButton: {
-    backgroundColor: Colors.primary[500],
-  },
-  accentButton: {
-    backgroundColor: Colors.accent[500],
-  },
+  primaryButton: {},
+  accentButton: {},
   buttonEmoji: {
     fontSize: FontSizes["2xl"],
     marginBottom: Spacing[2],
@@ -139,6 +153,5 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.base,
     fontWeight: FontWeights.medium,
     fontFamily: Fonts.medium,
-    color: Colors.white,
   },
 });

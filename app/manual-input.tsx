@@ -11,12 +11,12 @@ import {
 import { Header } from "../components/Header";
 import {
   BorderRadius,
-  Colors,
   Fonts,
   FontSizes,
   FontWeights,
   Spacing,
 } from "../constants/theme";
+import { useTheme } from "../context/ThemeContext";
 
 type Ingredient = {
   id: string;
@@ -25,6 +25,7 @@ type Ingredient = {
 
 export default function ManualInputScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
   const [inputText, setInputText] = useState("");
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
 
@@ -55,41 +56,59 @@ export default function ManualInputScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.white }]}>
       <Header title="Manual Input" showBackButton />
 
       {/* Input Section */}
       <View style={styles.inputSection}>
-        <Text style={styles.sectionTitle}>Add Ingredients</Text>
+        <Text style={[styles.sectionTitle, { color: colors.neutral[900] }]}>
+          Add Ingredients
+        </Text>
 
         <View style={styles.inputRow}>
-          <View style={styles.textInputContainer}>
+          <View
+            style={[
+              styles.textInputContainer,
+              { backgroundColor: colors.neutral[100] },
+            ]}
+          >
             <TextInput
               placeholder="Enter ingredient name"
               value={inputText}
               onChangeText={setInputText}
-              style={styles.textInput}
-              placeholderTextColor={Colors.neutral[400]}
+              style={[styles.textInput, { color: colors.neutral[700] }]}
+              placeholderTextColor={colors.neutral[400]}
               onSubmitEditing={addIngredient}
               returnKeyType="done"
             />
           </View>
 
-          <Pressable style={styles.addButton} onPress={addIngredient}>
-            <Text style={styles.addButtonText}>Add</Text>
+          <Pressable
+            style={[
+              styles.addButton,
+              {
+                backgroundColor: colors.primary[600],
+                shadowColor: colors.black,
+              },
+            ]}
+            onPress={addIngredient}
+          >
+            <Text style={[styles.addButtonText, { color: colors.white }]}>
+              Add
+            </Text>
           </Pressable>
         </View>
       </View>
 
       {/* Ingredients List */}
       <View style={styles.listSection}>
-        <Text style={styles.sectionTitle}>
+        <Text style={[styles.sectionTitle, { color: colors.neutral[900] }]}>
           Your Ingredients ({ingredients.length})
         </Text>
 
         {ingredients.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>
+            <Text style={[styles.emptyText, { color: colors.neutral[500] }]}>
               No ingredients added yet.{"\n"}Start by typing an ingredient
               above.
             </Text>
@@ -100,23 +119,47 @@ export default function ManualInputScreen() {
             keyExtractor={(item) => item.id}
             showsVerticalScrollIndicator={false}
             renderItem={({ item }) => (
-              <View style={styles.ingredientItem}>
-                <Text style={styles.ingredientName}>{item.name}</Text>
+              <View
+                style={[
+                  styles.ingredientItem,
+                  { backgroundColor: colors.neutral[50] },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.ingredientName,
+                    { color: colors.neutral[900] },
+                  ]}
+                >
+                  {item.name}
+                </Text>
                 <Pressable
                   onPress={() => removeIngredient(item.id)}
                   style={styles.removeButton}
                 >
-                  <Text style={styles.removeButtonText}>×</Text>
+                  <Text
+                    style={[styles.removeButtonText, { color: colors.error }]}
+                  >
+                    ×
+                  </Text>
                 </Pressable>
               </View>
             )}
             ListFooterComponent={
               <View style={{ paddingBottom: Spacing[6] }}>
                 <Pressable
-                  style={styles.findRecipesButton}
+                  style={[
+                    styles.findRecipesButton,
+                    { backgroundColor: colors.success },
+                  ]}
                   onPress={findRecipes}
                 >
-                  <Text style={styles.findRecipesButtonText}>
+                  <Text
+                    style={[
+                      styles.findRecipesButtonText,
+                      { color: colors.white },
+                    ]}
+                  >
                     Find Recipes ({ingredients.length} ingredients)
                   </Text>
                 </Pressable>
@@ -132,7 +175,6 @@ export default function ManualInputScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.white,
   },
   header: {
     paddingTop: 56,
@@ -147,13 +189,11 @@ const styles = StyleSheet.create({
   headerButtonText: {
     fontSize: FontSizes.lg,
     fontFamily: Fonts.medium,
-    color: Colors.primary[600],
   },
   headerTitle: {
     fontSize: FontSizes.xl,
     fontWeight: FontWeights.semibold,
     fontFamily: Fonts.semibold,
-    color: Colors.neutral[900],
   },
   headerDoneButton: {
     fontWeight: FontWeights.medium,
@@ -167,7 +207,6 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.lg,
     fontWeight: FontWeights.medium,
     fontFamily: Fonts.medium,
-    color: Colors.neutral[900],
     marginBottom: Spacing[3],
   },
   inputRow: {
@@ -178,7 +217,6 @@ const styles = StyleSheet.create({
   textInputContainer: {
     flex: 1,
     borderRadius: BorderRadius["2xl"],
-    backgroundColor: Colors.neutral[100],
     paddingHorizontal: Spacing[4],
     height: 58, // Added height for alignment
     justifyContent: "center",
@@ -186,22 +224,18 @@ const styles = StyleSheet.create({
   textInput: {
     fontSize: FontSizes.lg,
     fontFamily: Fonts.regular,
-    color: Colors.neutral[700],
   },
   addButton: {
-    backgroundColor: Colors.primary[600],
     borderRadius: BorderRadius["2xl"],
     paddingHorizontal: Spacing[6],
     justifyContent: "center",
     height: 58, // Match height of text input
-    shadowColor: Colors.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
     elevation: 2,
   },
   addButtonText: {
-    color: Colors.white,
     fontWeight: FontWeights.medium,
     fontFamily: Fonts.medium,
     fontSize: FontSizes.lg,
@@ -216,7 +250,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   emptyText: {
-    color: Colors.neutral[500],
     textAlign: "center",
     fontFamily: Fonts.regular,
     fontSize: FontSizes.lg,
@@ -225,7 +258,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: Colors.neutral[50],
     borderRadius: BorderRadius.xl,
     padding: Spacing[4],
     marginBottom: Spacing[3],
@@ -233,25 +265,21 @@ const styles = StyleSheet.create({
   ingredientName: {
     fontSize: FontSizes.lg,
     fontFamily: Fonts.regular,
-    color: Colors.neutral[900],
     flex: 1,
   },
   removeButton: {
     marginLeft: Spacing[4],
   },
   removeButtonText: {
-    color: Colors.error,
     fontSize: FontSizes.xl,
   },
   findRecipesButton: {
-    backgroundColor: Colors.success,
     borderRadius: BorderRadius["2xl"],
     padding: Spacing[4],
     alignItems: "center",
     marginTop: Spacing[4],
   },
   findRecipesButtonText: {
-    color: Colors.white,
     fontWeight: FontWeights.semibold,
     fontFamily: Fonts.semibold,
     fontSize: FontSizes.lg,

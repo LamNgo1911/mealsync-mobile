@@ -13,15 +13,16 @@ import {
 import { Header } from "../components/Header";
 import {
   BorderRadius,
-  Colors,
   Fonts,
   FontSizes,
   FontWeights,
   Spacing,
 } from "../constants/theme";
+import { useTheme } from "../context/ThemeContext";
 
 export default function CameraScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
   const cameraRef = useRef<CameraView>(null);
   const [photo, setPhoto] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
@@ -106,8 +107,12 @@ export default function CameraScreen() {
   if (!permission) {
     // Camera permissions are still loading.
     return (
-      <View style={styles.permissionContainer}>
-        <Text style={styles.permissionText}>Loading Camera...</Text>
+      <View
+        style={[styles.permissionContainer, { backgroundColor: colors.black }]}
+      >
+        <Text style={[styles.permissionText, { color: colors.white }]}>
+          Loading Camera...
+        </Text>
       </View>
     );
   }
@@ -115,22 +120,36 @@ export default function CameraScreen() {
   if (!permission.granted) {
     // Camera permissions are not granted yet.
     return (
-      <View style={styles.permissionContainer}>
-        <Text style={[styles.permissionText, { marginBottom: Spacing[4] }]}>
+      <View
+        style={[styles.permissionContainer, { backgroundColor: colors.black }]}
+      >
+        <Text
+          style={[
+            styles.permissionText,
+            { marginBottom: Spacing[4], color: colors.white },
+          ]}
+        >
           We need your permission to show the camera. Please grant permission in
           your device settings.
         </Text>
         <Pressable
-          style={[styles.permissionButton, styles.grantButton]}
+          style={[styles.permissionButton, { backgroundColor: colors.info }]}
           onPress={requestPermission}
         >
-          <Text style={styles.permissionButtonText}>Grant Permission</Text>
+          <Text style={[styles.permissionButtonText, { color: colors.white }]}>
+            Grant Permission
+          </Text>
         </Pressable>
         <Pressable
-          style={[styles.permissionButton, styles.backButton]}
+          style={[
+            styles.permissionButton,
+            { backgroundColor: colors.neutral[600] },
+          ]}
           onPress={() => router.back()}
         >
-          <Text style={styles.permissionButtonText}>Go Back</Text>
+          <Text style={[styles.permissionButtonText, { color: colors.white }]}>
+            Go Back
+          </Text>
         </Pressable>
       </View>
     );
@@ -143,11 +162,13 @@ export default function CameraScreen() {
     });
 
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: colors.white }]}>
         {/* Header */}
         <View style={styles.header}>
           <Pressable onPress={retakePhoto}>
-            <Text style={styles.retakeButton}>✕ Retake</Text>
+            <Text style={[styles.retakeButton, { color: colors.primary[600] }]}>
+              ✕ Retake
+            </Text>
           </Pressable>
         </View>
 
@@ -162,11 +183,22 @@ export default function CameraScreen() {
                   styles.spinner,
                   {
                     transform: [{ rotate: spin }],
+                    borderColor: colors.transparent,
+                    borderTopColor: colors.primary[500],
+                    borderRightColor: colors.primary[500],
                   },
                 ]}
               />
             )}
-            <View style={styles.photoContainer}>
+            <View
+              style={[
+                styles.photoContainer,
+                {
+                  backgroundColor: colors.neutral[100],
+                  borderColor: colors.neutral[200],
+                },
+              ]}
+            >
               <Image
                 source={{ uri: photo }}
                 style={{ width: "100%", height: "100%" }}
@@ -177,28 +209,25 @@ export default function CameraScreen() {
 
           {processing && (
             <View style={styles.processingContainer}>
-              <Text style={styles.processingText}>Scanning ingredients...</Text>
-              <Text style={styles.progressText}>{Math.round(progress)}%</Text>
+              <Text
+                style={[styles.processingText, { color: colors.accent[500] }]}
+              >
+                Scanning ingredients...
+              </Text>
+              <Text
+                style={[styles.progressText, { color: colors.accent[500] }]}
+              >
+                {Math.round(progress)}%
+              </Text>
             </View>
           )}
         </View>
-
-        {!processing && (
-          <View style={styles.footer}>
-            <Pressable
-              style={[styles.button, styles.usePhotoButton]}
-              onPress={startScanning}
-            >
-              <Text style={styles.usePhotoButtonText}>Use Photo</Text>
-            </Pressable>
-          </View>
-        )}
       </View>
     );
   }
 
   return (
-    <View style={styles.cameraContainer}>
+    <View style={[styles.cameraContainer, { backgroundColor: colors.black }]}>
       <CameraView
         style={StyleSheet.absoluteFillObject}
         ref={cameraRef}
@@ -209,12 +238,16 @@ export default function CameraScreen() {
 
       {/* Bottom Controls */}
       <View style={styles.controlsContainer}>
-        <Text style={styles.instructionsText}>
-          Point camera at ingredients to scan
-        </Text>
-
-        <Pressable style={styles.shutterButton} onPress={takePicture}>
-          <View style={styles.shutterInnerButton} />
+        <Pressable
+          style={[styles.shutterButton, { backgroundColor: colors.white }]}
+          onPress={takePicture}
+        >
+          <View
+            style={[
+              styles.shutterInnerButton,
+              { borderColor: colors.neutral[300] },
+            ]}
+          />
         </Pressable>
       </View>
     </View>
@@ -224,17 +257,14 @@ export default function CameraScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.white,
   },
   permissionContainer: {
     flex: 1,
-    backgroundColor: Colors.black,
     alignItems: "center",
     justifyContent: "center",
     padding: Spacing[6],
   },
   permissionText: {
-    color: Colors.white,
     fontSize: FontSizes.lg,
     fontFamily: Fonts.regular,
     textAlign: "center",
@@ -245,14 +275,9 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
     marginBottom: Spacing[4],
   },
-  grantButton: {
-    backgroundColor: Colors.info,
-  },
-  backButton: {
-    backgroundColor: Colors.neutral[600],
-  },
+  grantButton: {},
+  backButton: {},
   permissionButtonText: {
-    color: Colors.white,
     fontWeight: FontWeights.semibold,
     fontFamily: Fonts.semibold,
   },
@@ -264,7 +289,6 @@ const styles = StyleSheet.create({
   retakeButton: {
     fontSize: FontSizes.lg,
     fontFamily: Fonts.medium,
-    color: Colors.primary[600],
   },
   spinner: {
     position: "absolute",
@@ -272,9 +296,6 @@ const styles = StyleSheet.create({
     height: 304,
     borderRadius: 152,
     borderWidth: 4,
-    borderColor: Colors.transparent,
-    borderTopColor: Colors.primary[500],
-    borderRightColor: Colors.primary[500],
     zIndex: 20,
   },
   photoContainer: {
@@ -285,9 +306,7 @@ const styles = StyleSheet.create({
     height: 288,
     borderRadius: 144,
     overflow: "hidden",
-    backgroundColor: Colors.neutral[100],
     borderWidth: 2,
-    borderColor: Colors.neutral[200],
     zIndex: 10,
   },
   processingContainer: {
@@ -298,7 +317,6 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.lg,
     fontWeight: FontWeights.semibold,
     fontFamily: Fonts.semibold,
-    color: Colors.accent[500],
     marginBottom: Spacing[2],
     textAlign: "center",
   },
@@ -306,7 +324,6 @@ const styles = StyleSheet.create({
     fontSize: FontSizes["2xl"],
     fontWeight: FontWeights.bold,
     fontFamily: Fonts.bold,
-    color: Colors.accent[500],
     textAlign: "center",
   },
   footer: {
@@ -317,24 +334,19 @@ const styles = StyleSheet.create({
     padding: Spacing[4],
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: Colors.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
     elevation: 2,
   },
-  usePhotoButton: {
-    backgroundColor: Colors.accent[500],
-  },
+  usePhotoButton: {},
   usePhotoButtonText: {
-    color: Colors.white,
     fontWeight: FontWeights.semibold,
     fontFamily: Fonts.semibold,
     fontSize: FontSizes.lg,
   },
   cameraContainer: {
     flex: 1,
-    backgroundColor: Colors.black,
   },
   cameraHeader: {
     position: "absolute",
@@ -347,12 +359,10 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     alignSelf: "flex-start",
-    backgroundColor: "rgba(0,0,0,0.5)",
     borderRadius: BorderRadius.full,
     padding: Spacing[3],
   },
   closeButtonText: {
-    color: Colors.white,
     fontSize: FontSizes.lg,
     fontFamily: Fonts.regular,
   },
@@ -365,7 +375,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   instructionsText: {
-    color: Colors.white,
     textAlign: "center",
     fontFamily: Fonts.regular,
     marginBottom: Spacing[6],
@@ -373,7 +382,6 @@ const styles = StyleSheet.create({
   shutterButton: {
     width: 80,
     height: 80,
-    backgroundColor: Colors.white,
     borderRadius: BorderRadius.full,
     alignItems: "center",
     justifyContent: "center",
@@ -381,9 +389,7 @@ const styles = StyleSheet.create({
   shutterInnerButton: {
     width: 64,
     height: 64,
-    backgroundColor: Colors.white,
     borderRadius: BorderRadius.full,
     borderWidth: 4,
-    borderColor: Colors.neutral[300],
   },
 });
