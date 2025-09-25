@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import {
   BorderRadius,
   Colors,
+  Fonts,
   FontSizes,
   FontWeights,
   Spacing,
@@ -76,6 +77,7 @@ const styles = StyleSheet.create({
     marginTop: Spacing[3],
     fontSize: FontSizes.xl,
     fontWeight: FontWeights.semibold,
+    fontFamily: Fonts.semibold,
     color: Colors.neutral[900],
   },
   detailsContainer: {
@@ -85,11 +87,13 @@ const styles = StyleSheet.create({
   },
   rating: {
     fontSize: FontSizes.base,
+    fontFamily: Fonts.medium,
     color: Colors.neutral[700],
     marginRight: Spacing[2],
   },
   tag: {
     fontSize: FontSizes.base,
+    fontFamily: Fonts.regular,
     color: Colors.neutral[500],
   },
 });

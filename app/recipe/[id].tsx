@@ -6,6 +6,7 @@ import { Header } from "../../components/Header";
 import {
   BorderRadius,
   Colors,
+  Fonts,
   FontSizes,
   FontWeights,
   Spacing,
@@ -146,6 +147,7 @@ const styles = StyleSheet.create({
   },
   notFoundText: {
     fontSize: FontSizes.lg,
+    fontFamily: Fonts.regular,
     color: Colors.neutral[500],
   },
   scrollView: {
@@ -160,6 +162,7 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: FontSizes.lg,
+    fontFamily: Fonts.regular,
     color: Colors.neutral[600],
     marginBottom: Spacing[6],
     lineHeight: 24,
@@ -170,6 +173,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: FontSizes["2xl"],
     fontWeight: FontWeights.bold,
+    fontFamily: Fonts.bold,
     color: Colors.neutral[900],
     marginBottom: Spacing[4],
   },
@@ -196,9 +200,11 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: FontSizes.sm,
     fontWeight: FontWeights.bold,
+    fontFamily: Fonts.bold,
   },
   ingredientText: {
     fontSize: FontSizes.lg,
+    fontFamily: Fonts.regular,
     color: Colors.neutral[900],
   },
   ingredientTextChecked: {
@@ -223,9 +229,11 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontWeight: FontWeights.bold,
     fontSize: FontSizes.sm,
+    fontFamily: Fonts.bold,
   },
   instructionText: {
     fontSize: FontSizes.lg,
+    fontFamily: Fonts.regular,
     color: Colors.neutral[700],
     flex: 1,
     lineHeight: 24,
@@ -250,6 +258,7 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: Colors.white,
     fontWeight: FontWeights.semibold,
+    fontFamily: Fonts.semibold,
     fontSize: FontSizes.lg,
   },
 });

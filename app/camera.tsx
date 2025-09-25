@@ -13,6 +13,7 @@ import {
 import {
   BorderRadius,
   Colors,
+  Fonts,
   FontSizes,
   FontWeights,
   Spacing,
@@ -239,6 +240,7 @@ const styles = StyleSheet.create({
   permissionText: {
     color: Colors.white,
     fontSize: FontSizes.lg,
+    fontFamily: Fonts.regular,
     textAlign: "center",
   },
   permissionButton: {
@@ -256,6 +258,7 @@ const styles = StyleSheet.create({
   permissionButtonText: {
     color: Colors.white,
     fontWeight: FontWeights.semibold,
+    fontFamily: Fonts.semibold,
   },
   header: {
     paddingTop: 56,
@@ -264,6 +267,7 @@ const styles = StyleSheet.create({
   },
   retakeButton: {
     fontSize: FontSizes.lg,
+    fontFamily: Fonts.medium,
     color: Colors.primary[600],
   },
   spinner: {
@@ -297,6 +301,7 @@ const styles = StyleSheet.create({
   processingText: {
     fontSize: FontSizes.lg,
     fontWeight: FontWeights.semibold,
+    fontFamily: Fonts.semibold,
     color: Colors.accent[500],
     marginBottom: Spacing[2],
     textAlign: "center",
@@ -304,6 +309,7 @@ const styles = StyleSheet.create({
   progressText: {
     fontSize: FontSizes["2xl"],
     fontWeight: FontWeights.bold,
+    fontFamily: Fonts.bold,
     color: Colors.accent[500],
     textAlign: "center",
   },
@@ -327,6 +333,7 @@ const styles = StyleSheet.create({
   usePhotoButtonText: {
     color: Colors.white,
     fontWeight: FontWeights.semibold,
+    fontFamily: Fonts.semibold,
     fontSize: FontSizes.lg,
   },
   cameraContainer: {
@@ -351,6 +358,7 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: Colors.white,
     fontSize: FontSizes.lg,
+    fontFamily: Fonts.regular,
   },
   controlsContainer: {
     position: "absolute",
@@ -363,6 +371,7 @@ const styles = StyleSheet.create({
   instructionsText: {
     color: Colors.white,
     textAlign: "center",
+    fontFamily: Fonts.regular,
     marginBottom: Spacing[6],
   },
   shutterButton: {

@@ -11,6 +11,7 @@ import {
 import {
   BorderRadius,
   Colors,
+  Fonts,
   FontSizes,
   FontWeights,
   Spacing,
@@ -157,15 +158,18 @@ const styles = StyleSheet.create({
   },
   headerButtonText: {
     fontSize: FontSizes.lg,
+    fontFamily: Fonts.medium,
     color: Colors.primary[600],
   },
   headerTitle: {
     fontSize: FontSizes.xl,
     fontWeight: FontWeights.semibold,
+    fontFamily: Fonts.semibold,
     color: Colors.neutral[900],
   },
   headerDoneButton: {
     fontWeight: FontWeights.medium,
+    fontFamily: Fonts.medium,
   },
   inputSection: {
     paddingHorizontal: Spacing[6],
@@ -174,6 +178,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: FontSizes.lg,
     fontWeight: FontWeights.medium,
+    fontFamily: Fonts.medium,
     color: Colors.neutral[900],
     marginBottom: Spacing[3],
   },
@@ -192,6 +197,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     fontSize: FontSizes.lg,
+    fontFamily: Fonts.regular,
     color: Colors.neutral[700],
   },
   addButton: {
@@ -209,6 +215,7 @@ const styles = StyleSheet.create({
   addButtonText: {
     color: Colors.white,
     fontWeight: FontWeights.medium,
+    fontFamily: Fonts.medium,
     fontSize: FontSizes.lg,
   },
   listSection: {
@@ -223,6 +230,7 @@ const styles = StyleSheet.create({
   emptyText: {
     color: Colors.neutral[500],
     textAlign: "center",
+    fontFamily: Fonts.regular,
     fontSize: FontSizes.lg,
   },
   ingredientItem: {
@@ -236,6 +244,7 @@ const styles = StyleSheet.create({
   },
   ingredientName: {
     fontSize: FontSizes.lg,
+    fontFamily: Fonts.regular,
     color: Colors.neutral[900],
     flex: 1,
   },
@@ -256,6 +265,7 @@ const styles = StyleSheet.create({
   findRecipesButtonText: {
     color: Colors.white,
     fontWeight: FontWeights.semibold,
+    fontFamily: Fonts.semibold,
     fontSize: FontSizes.lg,
   },
 });

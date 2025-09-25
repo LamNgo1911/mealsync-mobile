@@ -7,6 +7,7 @@ import { RecipeSection } from "../../components/RecipeSection";
 import {
   BorderRadius,
   Colors,
+  Fonts,
   FontSizes,
   FontWeights,
   Spacing,
@@ -99,6 +100,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: FontSizes["2xl"],
     fontWeight: FontWeights.bold,
+    fontFamily: Fonts.bold,
     color: Colors.neutral[900],
     marginBottom: Spacing[4],
   },
@@ -136,6 +138,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: FontSizes.base,
     fontWeight: FontWeights.medium,
+    fontFamily: Fonts.medium,
     color: Colors.white,
   },
 });

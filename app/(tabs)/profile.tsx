@@ -4,6 +4,7 @@ import { RecipeSection } from "../../components/RecipeSection";
 import {
   BorderRadius,
   Colors,
+  Fonts,
   FontSizes,
   FontWeights,
   Spacing,
@@ -82,11 +83,13 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: FontSizes["2xl"],
     fontWeight: FontWeights.bold,
+    fontFamily: Fonts.bold,
     color: Colors.neutral[900], // Approximation of slate-900
     marginBottom: Spacing[2],
   },
   userBio: {
     fontSize: FontSizes.lg,
+    fontFamily: Fonts.regular,
     color: Colors.info, // Approximation of blue-600
     marginBottom: Spacing[6],
   },

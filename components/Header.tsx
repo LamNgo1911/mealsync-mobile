@@ -5,6 +5,7 @@ import appIcon from "../assets/images/logo.png";
 import {
   BorderRadius,
   Colors,
+  Fonts,
   FontSizes,
   FontWeights,
   Spacing,
@@ -30,13 +31,6 @@ export function Header({ title }: HeaderProps) {
 
         {/* Centered Title */}
         <Text style={styles.title}>{title}</Text>
-
-        {/* Right Settings */}
-        <View style={styles.settingsContainer}>
-          <View style={styles.settingsIconWrapper}>
-            <Text style={styles.settingsIcon}>⚙️</Text>
-          </View>
-        </View>
       </View>
     </View>
   );
@@ -58,6 +52,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: FontSizes["2xl"],
     fontWeight: FontWeights.semibold,
+    fontFamily: Fonts.art,
     color: Colors.neutral[900],
     textAlign: "center",
   },
@@ -84,5 +79,6 @@ const styles = StyleSheet.create({
   },
   settingsIcon: {
     fontSize: FontSizes.base,
+    fontFamily: Fonts.regular,
   },
 });

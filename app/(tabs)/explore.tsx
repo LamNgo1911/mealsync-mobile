@@ -8,6 +8,7 @@ import {
   BorderRadius,
   Colors,
   FontSizes,
+  Fonts,
   Spacing,
 } from "../../constants/theme";
 import { getExploreRecipes } from "../../data/recipes";
@@ -122,6 +123,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     fontSize: FontSizes.lg,
+    fontFamily: Fonts.regular,
     color: Colors.neutral[700],
     height: "100%",
   },
