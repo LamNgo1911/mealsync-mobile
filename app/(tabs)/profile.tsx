@@ -48,9 +48,6 @@ export default function ProfileScreen() {
           <Text style={[styles.userName, { color: colors.neutral[900] }]}>
             Ethan Carter
           </Text>
-          <Text style={[styles.userBio, { color: colors.info }]}>
-            Foodie & Recipe Explorer
-          </Text>
         </View>
 
         <RecipeSection

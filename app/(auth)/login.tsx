@@ -83,7 +83,7 @@ export default function LoginScreen() {
       <Link href="/(auth)/register" asChild>
         <Pressable>
           <Text style={[styles.registerText, { color: colors.neutral[600] }]}>
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Text style={[styles.registerLink, { color: colors.primary[600] }]}>
               Sign up
             </Text>
