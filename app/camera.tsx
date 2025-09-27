@@ -61,17 +61,22 @@ export default function CameraScreen() {
       });
     }, 100);
 
+    // Simulate scanning process
     setTimeout(() => {
       rotation.stop();
       rotateAnim.setValue(0);
       clearInterval(progressInterval);
       setProcessing(false);
       setProgress(0);
-      Alert.alert(
-        "Success",
-        "Photo captured! Ingredient scanning will be implemented next."
-      );
-      router.back();
+
+      // Navigate to suggestions screen with mock data
+      const mockIngredients = "Tomato, Cheese, Basil, Olive Oil";
+      router.push({
+        pathname: "/recipe-suggestions",
+        params: { ingredients: mockIngredients },
+      });
+      // Reset photo state after navigating away
+      setPhoto(null);
     }, 3000);
   };
 
