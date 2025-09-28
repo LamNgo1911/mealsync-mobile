@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
@@ -91,6 +92,86 @@ export default function RecipeDetail() {
           <Text style={[styles.description, { color: colors.neutral[600] }]}>
             {recipe.description}
           </Text>
+
+          {/* Tags */}
+          <View style={styles.tagsContainer}>
+            {recipe.tags.map((tag) => (
+              <View
+                key={tag}
+                style={[styles.tag, { backgroundColor: colors.neutral[100] }]}
+              >
+                <Text style={[styles.tagText, { color: colors.neutral[800] }]}>
+                  {tag}
+                </Text>
+              </View>
+            ))}
+          </View>
+          {/* Info Cards */}
+          <View style={styles.infoContainer}>
+            <View
+              style={[
+                styles.infoCard,
+                {
+                  backgroundColor: colors.neutral[50],
+                  borderColor: colors.neutral[200],
+                },
+              ]}
+            >
+              <Ionicons
+                name="time-outline"
+                size={24}
+                color={colors.primary[500]}
+              />
+              <Text style={[styles.infoValue, { color: colors.neutral[900] }]}>
+                {recipe.totalTime} min
+              </Text>
+              <Text style={[styles.infoText, { color: colors.neutral[600] }]}>
+                Total Time
+              </Text>
+            </View>
+            <View
+              style={[
+                styles.infoCard,
+                {
+                  backgroundColor: colors.neutral[50],
+                  borderColor: colors.neutral[200],
+                },
+              ]}
+            >
+              <Ionicons
+                name="people-outline"
+                size={24}
+                color={colors.primary[500]}
+              />
+              <Text style={[styles.infoValue, { color: colors.neutral[900] }]}>
+                {recipe.servings}
+              </Text>
+              <Text style={[styles.infoText, { color: colors.neutral[600] }]}>
+                Servings
+              </Text>
+            </View>
+            <View
+              style={[
+                styles.infoCard,
+                {
+                  backgroundColor: colors.neutral[50],
+                  borderColor: colors.neutral[200],
+                },
+              ]}
+            >
+              <Ionicons
+                name="bar-chart-outline"
+                size={24}
+                color={colors.primary[500]}
+              />
+              <Text style={[styles.infoValue, { color: colors.neutral[900] }]}>
+                {recipe.difficulty}
+              </Text>
+              <Text style={[styles.infoText, { color: colors.neutral[600] }]}>
+                Difficulty
+              </Text>
+            </View>
+          </View>
 
           {/* Ingredients Section */}
           <View style={styles.section}>
@@ -231,6 +312,43 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.regular,
     marginBottom: Spacing[6],
     lineHeight: 24,
+  },
+  tagsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: Spacing[2],
+    marginBottom: Spacing[6],
+  },
+  tag: {
+    paddingHorizontal: Spacing[3],
+    paddingVertical: Spacing[1],
+    borderRadius: BorderRadius.lg,
+  },
+  tagText: {
+    fontFamily: Fonts.medium,
+    fontSize: FontSizes.sm,
+  },
+  infoContainer: {
+    flexDirection: "row",
+    gap: Spacing[3],
+    marginBottom: Spacing[8],
+  },
+  infoCard: {
+    flex: 1,
+    padding: Spacing[3],
+    borderRadius: BorderRadius.xl,
+    alignItems: "center",
+    borderWidth: 1,
+    gap: Spacing[1],
+  },
+  infoText: {
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    marginBottom: Spacing[1],
+  },
+  infoValue: {
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.lg,
   },
   section: {
     marginBottom: Spacing[8],

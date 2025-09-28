@@ -19,11 +19,15 @@ export function Header({ title, showBackButton = false }: HeaderProps) {
       <View style={styles.innerContainer}>
         <View style={styles.iconContainer}>
           {showBackButton ? (
-            <Pressable onPress={() => router.back()}>
-              <Text style={[styles.backButton, { color: colors.neutral[800] }]}>
-                ‹
-              </Text>
-            </Pressable>
+            <View style={styles.backButtonContainer}>
+              <Pressable onPress={() => router.back()}>
+                <Text
+                  style={[styles.backButton, { color: colors.neutral[800] }]}
+                >
+                  ‹
+                </Text>
+              </Pressable>
+            </View>
           ) : (
             <Image
               source={appIcon}
@@ -73,6 +77,12 @@ const styles = StyleSheet.create({
   logo: {
     width: 128,
     height: 128,
+  },
+  backButtonContainer: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
   },
   backButton: {
     fontSize: FontSizes["3xl"],
