@@ -44,11 +44,9 @@ function RecipeCardComponent({ recipe, onPress }: RecipeCardProps) {
         {recipe.name}
       </Text>
       <View style={styles.detailsContainer}>
-        {recipe.tags && recipe.tags.length > 0 ? (
-          <Text style={[styles.tag, { color: colors.neutral[500] }]}>
-            {recipe.tags[0]}
-          </Text>
-        ) : null}
+        <Text style={[styles.detailText, { color: colors.neutral[500] }]}>
+          {recipe.cuisine}
+        </Text>
       </View>
     </Pressable>
   );
@@ -78,8 +76,9 @@ const styles = StyleSheet.create({
     marginTop: Spacing[2],
     flexDirection: "row",
     alignItems: "center",
+    gap: Spacing[2],
   },
-  tag: {
+  detailText: {
     fontSize: FontSizes.base,
     fontFamily: Fonts.regular,
   },
