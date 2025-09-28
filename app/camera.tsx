@@ -188,9 +188,7 @@ export default function CameraScreen() {
         </View>
 
         {/* Photo Container */}
-        <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-        >
+        <View style={styles.photoWrapper}>
           <View style={{ width: 304, height: 304 }}>
             {processing && (
               <Animated.View
@@ -305,6 +303,11 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.lg,
     fontFamily: Fonts.medium,
   },
+  photoWrapper: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   spinner: {
     position: "absolute",
     width: 304,
@@ -325,8 +328,11 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   processingContainer: {
+    position: "absolute",
+    bottom: Spacing[20],
+    left: 0,
+    right: 0,
     alignItems: "center",
-    marginTop: Spacing[8],
   },
   processingText: {
     fontSize: FontSizes.lg,

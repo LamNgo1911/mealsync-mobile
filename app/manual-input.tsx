@@ -122,7 +122,7 @@ export default function ManualInputScreen() {
               <View
                 style={[
                   styles.ingredientItem,
-                  { backgroundColor: colors.neutral[50] },
+                  { backgroundColor: colors.neutral[100] },
                 ]}
               >
                 <Text
