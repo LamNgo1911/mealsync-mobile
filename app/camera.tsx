@@ -18,11 +18,13 @@ import {
   FontWeights,
   Spacing,
 } from "../constants/theme";
+import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 
 export default function CameraScreen() {
   const router = useRouter();
   const { colors } = useTheme();
+  const { scanCount, incrementScanCount } = useAuth();
   const cameraRef = useRef<CameraView>(null);
   const [photo, setPhoto] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
@@ -81,11 +83,19 @@ export default function CameraScreen() {
   };
 
   const takePicture = async () => {
+    // Check user's scan limit
+    // For now, we assume a "free" user who gets 1 scan.
+    if (scanCount >= 1) {
+      router.push("/premium");
+      return;
+    }
+
     if (cameraRef.current) {
       try {
         const result = await cameraRef.current.takePictureAsync();
 
         if (result?.uri) {
+          incrementScanCount(); // Increment scan count after successful photo
           setPhoto(result.uri);
           setTimeout(() => startScanning(), 500);
         } else {
