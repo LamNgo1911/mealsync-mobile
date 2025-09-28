@@ -1,43 +1,141 @@
 import { useRouter } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
-import { FlatList, StyleSheet, TextInput, View } from "react-native";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Dimensions,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
+} from "react-native";
 import { Header } from "../../components/Header";
 import { RecipeCard } from "../../components/RecipeCard";
 import { SkeletonCard } from "../../components/SkeletonCard";
 import { BorderRadius, Fonts, FontSizes, Spacing } from "../../constants/theme";
 import { useTheme } from "../../context/ThemeContext";
 import { getExploreRecipes } from "../../data/recipes";
+import { Recipe } from "../../types";
 
-type Recipe = {
-  id: string;
-  title: string;
-  image: any;
-  rating: number;
-  tag: string;
-};
 type SkeletonItem = { id: string; skeleton: true };
+type ListItem = Recipe | SkeletonItem;
 
-const MOCK_RECIPES = getExploreRecipes();
+const ALL_RECIPES = getExploreRecipes();
+const PAGE_SIZE = 6;
+const { width } = Dimensions.get("window");
+
+// Simulate an API call that matches the backend pagination structure
+const fetchRecipes = async (
+  page: number,
+  limit: number,
+  query: string
+): Promise<{
+  data: Recipe[];
+  totalPages: number;
+}> => {
+  const q = query.trim().toLowerCase();
+  const filtered = ALL_RECIPES.filter(
+    (r) =>
+      !q ||
+      r.name.toLowerCase().includes(q) ||
+      r.tags.some((tag) => tag.toLowerCase().includes(q))
+  );
+
+  // Simulate network delay
+  await new Promise((resolve) => setTimeout(resolve, 800));
+
+  const offset = (page - 1) * limit;
+  const pageData = filtered.slice(offset, offset + limit);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / limit));
+
+  return {
+    data: pageData,
+    totalPages,
+  };
+};
 
 export default function ExploreScreen() {
   const router = useRouter();
   const { colors } = useTheme();
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // refs
+  const outerFlatListRef = useRef<FlatList<number>>(null);
+  const lastLoadedPageRef = useRef<number>(0);
+
+  const loadRecipes = useCallback(
+    async (newPage: number) => {
+      setLoading(true);
+      try {
+        const response = await fetchRecipes(newPage, PAGE_SIZE, query);
+        setRecipes(response.data);
+        setTotalPages(response.totalPages);
+        setPage(newPage);
+        lastLoadedPageRef.current = newPage;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [query]
+  );
 
   useEffect(() => {
-    const t = setTimeout(() => setLoading(false), 800);
-    return () => clearTimeout(t);
-  }, []);
+    // Debounce search query and reset to page 1
+    const handler = setTimeout(() => {
+      outerFlatListRef.current?.scrollToIndex({ index: 0, animated: true });
+      loadRecipes(1);
+    }, 300);
 
-  const data = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return MOCK_RECIPES;
-    return MOCK_RECIPES.filter(
-      (r) =>
-        r.title.toLowerCase().includes(q) || r.tag.toLowerCase().includes(q)
-    );
-  }, [query]);
+    return () => clearTimeout(handler);
+  }, [query, loadRecipes]);
+
+  // Initial load
+  useEffect(() => {
+    loadRecipes(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // run once on mount
+
+  const createSkeletonsForPage = (pageNum: number) =>
+    Array.from({ length: PAGE_SIZE }).map((_, i) => ({
+      id: `s-${pageNum}-${i}`,
+      skeleton: true,
+    })) as SkeletonItem[];
+
+  const dataForList: ListItem[] =
+    loading && recipes.length === 0
+      ? Array.from({ length: PAGE_SIZE }).map((_, i) => ({
+          id: `s-init-${i}`,
+          skeleton: true,
+        }))
+      : recipes.length % 2 !== 0
+        ? [...recipes, { id: `placeholder-${recipes.length}` } as Recipe]
+        : recipes;
+
+  const PaginationControls = () => (
+    <View style={styles.paginationContainer}>
+      {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+        <Pressable
+          key={p}
+          onPress={() => {
+            loadRecipes(p);
+            outerFlatListRef.current?.scrollToIndex({
+              index: p - 1,
+              animated: true,
+            });
+          }}
+          style={[
+            styles.dot,
+            p === page
+              ? { ...styles.activeDot, backgroundColor: colors.primary[500] }
+              : { ...styles.inactiveDot, backgroundColor: colors.neutral[300] },
+          ]}
+        />
+      ))}
+    </View>
+  );
 
   return (
     <View style={[styles.container, { backgroundColor: colors.white }]}>
@@ -58,47 +156,83 @@ export default function ExploreScreen() {
         </View>
       </View>
 
-      {/* Recipes List */}
+      {/* Swipeable Pagination */}
       <FlatList
-        numColumns={2}
-        data={
-          (loading
-            ? Array.from({ length: 6 }).map((_, i) => ({
-                id: `s-${i}`,
-                skeleton: true,
-              }))
-            : data) as (Recipe | SkeletonItem)[]
-        }
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContentContainer}
-        columnWrapperStyle={styles.listColumnWrapper}
-        renderItem={({ item }) => {
-          if ((item as SkeletonItem).skeleton) {
-            return (
-              <View style={styles.cardContainer}>
-                <SkeletonCard />
-              </View>
-            );
+        ref={outerFlatListRef}
+        style={{ flex: 1 }}
+        contentContainerStyle={{ flexGrow: 1 }}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        data={Array.from({ length: totalPages }, (_, i) => i + 1)}
+        keyExtractor={(item) => `page-${item}`}
+        getItemLayout={(_, index) => ({
+          length: width,
+          offset: width * index,
+          index,
+        })}
+        onMomentumScrollEnd={(e) => {
+          const newPage = Math.round(e.nativeEvent.contentOffset.x / width) + 1;
+          if (newPage !== lastLoadedPageRef.current) {
+            loadRecipes(newPage);
+          } else {
+            setPage(newPage);
           }
-          const r = item as Recipe;
+        }}
+        renderItem={({ item: pageNum }) => {
+          const pageData =
+            page === pageNum ? dataForList : createSkeletonsForPage(pageNum);
+
           return (
-            <View style={styles.cardContainer}>
-              <RecipeCard
-                id={r.id}
-                name={r.title}
-                imageUrl={r.image}
-                rating={r.rating}
-                tags={[r.tag]}
-                onPress={(id) =>
-                  router.push({ pathname: "/recipe/[id]", params: { id } })
-                }
+            <View style={{ width, flex: 1 }}>
+              <FlatList
+                data={pageData}
+                keyExtractor={(it, idx) => `${(it as any).id}-${idx}`}
+                numColumns={2}
+                contentContainerStyle={styles.listContentContainer}
+                columnWrapperStyle={styles.listColumnWrapper}
+                renderItem={({ item: innerItem }) => {
+                  if ((innerItem as SkeletonItem).skeleton) {
+                    return (
+                      <View style={styles.cardContainer}>
+                        <SkeletonCard />
+                      </View>
+                    );
+                  }
+                  const r = innerItem as Recipe;
+
+                  if (!r.name) {
+                    return (
+                      <View
+                        style={[styles.cardContainer, styles.placeholder]}
+                      />
+                    );
+                  }
+
+                  return (
+                    <View style={styles.cardContainer}>
+                      <RecipeCard
+                        recipe={r}
+                        onPress={(id) =>
+                          router.push({
+                            pathname: "/recipe/[id]",
+                            params: { id },
+                          })
+                        }
+                      />
+                    </View>
+                  );
+                }}
+                ItemSeparatorComponent={() => <View style={styles.separator} />}
+                showsVerticalScrollIndicator={false}
+                style={{ flex: 1 }}
               />
             </View>
           );
         }}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-        showsVerticalScrollIndicator={false}
       />
+
+      {totalPages > 1 && <PaginationControls />}
     </View>
   );
 }
@@ -113,8 +247,8 @@ const styles = StyleSheet.create({
   },
   searchBox: {
     borderRadius: BorderRadius["2xl"],
-    paddingHorizontal: 20, // px-5
-    height: 56, // h-14
+    paddingHorizontal: 20,
+    height: 56,
     justifyContent: "center",
   },
   searchInput: {
@@ -124,7 +258,7 @@ const styles = StyleSheet.create({
   },
   listContentContainer: {
     paddingHorizontal: Spacing[6],
-    paddingBottom: Spacing[6],
+    paddingBottom: Spacing[2],
   },
   listColumnWrapper: {
     justifyContent: "space-between",
@@ -133,7 +267,27 @@ const styles = StyleSheet.create({
   cardContainer: {
     flex: 1,
   },
+  placeholder: {
+    backgroundColor: "transparent",
+  },
   separator: {
-    height: 28, // h-7
+    height: 28,
+  },
+  paginationContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: Spacing[4],
+  },
+  dot: {
+    height: 8,
+    borderRadius: 5,
+    marginHorizontal: 4,
+  },
+  activeDot: {
+    width: 8,
+  },
+  inactiveDot: {
+    width: 8,
   },
 });

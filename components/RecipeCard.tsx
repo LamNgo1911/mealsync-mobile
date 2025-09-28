@@ -9,32 +9,25 @@ import {
   Spacing,
 } from "../constants/theme";
 import { useTheme } from "../context/ThemeContext";
+import { Recipe } from "../types";
 
 export type RecipeCardProps = {
-  id: string;
-  name: string;
-  imageUrl: any;
-  rating?: number;
-  tags?: string[];
+  recipe: Recipe;
   onPress?: (id: string) => void;
 };
 
-function RecipeCardComponent({
-  id,
-  name,
-  imageUrl,
-  rating,
-  tags,
-  onPress,
-}: RecipeCardProps) {
+function RecipeCardComponent({ recipe, onPress }: RecipeCardProps) {
   const { colors } = useTheme();
-  const source = typeof imageUrl === "string" ? { uri: imageUrl } : imageUrl;
+  const source =
+    typeof recipe.imageUrl === "string"
+      ? { uri: recipe.imageUrl }
+      : recipe.imageUrl;
   return (
     <Pressable
-      onPress={() => onPress?.(id)}
+      onPress={() => onPress?.(recipe.id)}
       style={styles.container}
       accessibilityRole="button"
-      accessibilityLabel={name}
+      accessibilityLabel={recipe.name}
     >
       <View style={[styles.imageContainer, { backgroundColor: colors.white }]}>
         <Image
@@ -48,17 +41,12 @@ function RecipeCardComponent({
         style={[styles.title, { color: colors.neutral[900] }]}
         numberOfLines={2}
       >
-        {name}
+        {recipe.name}
       </Text>
       <View style={styles.detailsContainer}>
-        {typeof rating === "number" && (
-          <Text style={[styles.rating, { color: colors.neutral[700] }]}>
-            {rating.toFixed(1)}
-          </Text>
-        )}
-        {tags && tags.length > 0 ? (
+        {recipe.tags && recipe.tags.length > 0 ? (
           <Text style={[styles.tag, { color: colors.neutral[500] }]}>
-            • {tags[0]}
+            {recipe.tags[0]}
           </Text>
         ) : null}
       </View>
@@ -90,11 +78,6 @@ const styles = StyleSheet.create({
     marginTop: Spacing[2],
     flexDirection: "row",
     alignItems: "center",
-  },
-  rating: {
-    fontSize: FontSizes.sm,
-    fontFamily: Fonts.medium,
-    marginRight: Spacing[2],
   },
   tag: {
     fontSize: FontSizes.base,

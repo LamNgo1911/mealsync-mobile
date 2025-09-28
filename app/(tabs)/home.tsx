@@ -41,7 +41,7 @@ export default function HomeScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.white }]}>
-      <Header title="" />
+      <Header />
 
       <ScrollView
         style={styles.scrollView}
@@ -96,7 +96,6 @@ export default function HomeScreen() {
           title="Recommended Meals"
           recipes={RECOMMENDED_MEALS}
           loading={loading}
-          showCategory={true}
         />
       </ScrollView>
     </View>

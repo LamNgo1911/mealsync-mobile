@@ -18,7 +18,8 @@ import {
   Spacing,
 } from "../../constants/theme";
 import { useTheme } from "../../context/ThemeContext";
-import { getRecipeById, RecipeIngredient } from "../../data/recipes";
+import { getRecipeById } from "../../data/recipes";
+import { RecipeIngredient } from "../../types";
 
 // Client-side state for checkboxes
 type IngredientState = RecipeIngredient & { checked: boolean };
