@@ -85,8 +85,8 @@ export default function CameraScreen() {
   const takePicture = async () => {
     // Check user's scan limit
     // For now, we assume a "free" user who gets 1 scan.
-    if (scanCount >= 1) {
-      router.push("/premium");
+    if (scanCount >= 5) {
+      router.push("/subscription");
       return;
     }
 
