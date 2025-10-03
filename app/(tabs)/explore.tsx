@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -153,6 +154,13 @@ export default function ExploreScreen() {
             style={[styles.searchInput, { color: colors.neutral[700] }]}
             placeholderTextColor={colors.neutral[400]}
           />
+          <Pressable onPress={() => router.push("/filter")}>
+            <Ionicons
+              name="options-outline"
+              size={24}
+              color={colors.neutral[500]}
+            />
+          </Pressable>
         </View>
       </View>
 
@@ -250,11 +258,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     height: 56,
     justifyContent: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing[4],
   },
   searchInput: {
     fontSize: FontSizes.lg,
     fontFamily: Fonts.regular,
     height: "100%",
+    flex: 1,
   },
   listContentContainer: {
     paddingHorizontal: Spacing[6],
