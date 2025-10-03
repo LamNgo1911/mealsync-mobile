@@ -50,11 +50,7 @@ export default function ProfileScreen() {
           </Text>
         </View>
 
-        <RecipeSection
-          title="Saved Recipes"
-          recipes={SAVED_RECIPES}
-          showCategory={false}
-        />
+        <RecipeSection title="Saved Recipes" recipes={SAVED_RECIPES} />
       </ScrollView>
     </View>
   );
@@ -95,6 +91,22 @@ const styles = StyleSheet.create({
     fontWeight: FontWeights.bold,
     fontFamily: Fonts.bold,
     marginBottom: Spacing[2],
+  },
+  upgradeButton: {
+    marginTop: Spacing[4],
+    paddingVertical: Spacing[3],
+    paddingHorizontal: Spacing[6],
+    borderRadius: BorderRadius.full,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  upgradeButtonText: {
+    fontSize: FontSizes.lg,
+    fontWeight: FontWeights.semibold,
+    fontFamily: Fonts.semibold,
+    textAlign: "center",
   },
   userBio: {
     fontSize: FontSizes.lg,
