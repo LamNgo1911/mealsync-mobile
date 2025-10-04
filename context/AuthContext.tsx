@@ -1,5 +1,7 @@
 import { User, UserRole } from "@/types/user";
+import * as Google from "expo-auth-session/providers/google";
 import { useRouter, useSegments } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
 import React, {
   createContext,
   useContext,
@@ -8,8 +10,11 @@ import React, {
   useState,
 } from "react";
 
+WebBrowser.maybeCompleteAuthSession();
+
 interface AuthContextType {
   signIn: () => void;
+  signInWithGoogle: () => void;
   signOut: () => void;
   user: User | null;
   scanCount: number;
@@ -61,6 +66,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // setIsLoading(false); // This line was removed as per the new_code, as isLoading is no longer in AuthContextType
   }, []);
 
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    // Replace with your own client IDs
+    iosClientId: "YOUR_IOS_CLIENT_ID.apps.googleusercontent.com",
+    androidClientId: "YOUR_ANDROID_CLIENT_ID.apps.googleusercontent.com",
+    webClientId: "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com",
+    expoClientId: "YOUR_EXPO_CLIENT_ID.apps.googleusercontent.com",
+  });
+
+  useEffect(() => {
+    if (response?.type === "success") {
+      const { authentication } = response;
+      if (authentication?.accessToken) {
+        fetchUserInfo(authentication.accessToken);
+      }
+    }
+  }, [response]);
+
+  async function fetchUserInfo(token: string) {
+    const result = await fetch(
+      "https://www.googleapis.com/oauth2/v3/userinfo",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    if (result.ok) {
+      const googleUser = await result.json();
+      // Use the Google user info to sign in
+      setUser({
+        id: googleUser.sub,
+        email: googleUser.email,
+        name: googleUser.name,
+        // Set default values for other fields
+        role: UserRole.USER,
+        userPreference: {
+          id: "pref-id",
+          dietaryRestrictions: [],
+          allergies: [],
+          preferredCuisines: [],
+          notifications: { push: true, email: false },
+        },
+      });
+      setScanCount(0);
+      router.replace("/(tabs)/home");
+    }
+  }
+
   useProtectedRoute(user ? user.id : null);
 
   const authContextValue: AuthContextType = useMemo(
@@ -83,6 +135,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setScanCount(0); // Reset scan count on sign-in
         router.replace("/(tabs)/home");
       },
+      signInWithGoogle: () => {
+        promptAsync();
+      },
       signOut: () => {
         setUser(null);
         router.replace("/(auth)/login");
@@ -93,7 +148,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setScanCount((prev) => prev + 1);
       },
     }),
-    [user, scanCount, router]
+    [user, scanCount, router, request, response, promptAsync]
   );
 
   return (
