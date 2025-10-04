@@ -71,7 +71,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     iosClientId: "YOUR_IOS_CLIENT_ID.apps.googleusercontent.com",
     androidClientId: "YOUR_ANDROID_CLIENT_ID.apps.googleusercontent.com",
     webClientId: "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com",
-    expoClientId: "YOUR_EXPO_CLIENT_ID.apps.googleusercontent.com",
   });
 
   useEffect(() => {
