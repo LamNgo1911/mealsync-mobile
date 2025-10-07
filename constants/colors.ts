@@ -77,6 +77,9 @@ export const Colors = {
     tertiary: "#94a3b8",
     inverse: "#ffffff",
   },
+  border: "#e2e8f0",
+  input: "#f1f5f9",
+  placeholder: "#94a3b8",
 } as const;
 
 // Usage Examples for NativeWind classes:
