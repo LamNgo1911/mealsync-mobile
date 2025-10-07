@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
@@ -31,6 +32,9 @@ export default function CameraScreen() {
   const [progress, setProgress] = useState(0);
   const [permission, requestPermission] = useCameraPermissions();
   const rotateAnim = useRef(new Animated.Value(0)).current;
+  const rotationLoop = useRef<Animated.CompositeAnimation | null>(null);
+  const progressIntervalRef = useRef<number | null>(null);
+  const scanTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     // We only need to request permission if it's not determined yet.
@@ -43,7 +47,7 @@ export default function CameraScreen() {
     setProcessing(true);
     setProgress(0);
 
-    const rotation = Animated.loop(
+    rotationLoop.current = Animated.loop(
       Animated.timing(rotateAnim, {
         toValue: 1,
         duration: 2000,
@@ -51,12 +55,14 @@ export default function CameraScreen() {
       })
     );
 
-    rotation.start();
+    rotationLoop.current.start();
 
-    const progressInterval = setInterval(() => {
+    progressIntervalRef.current = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
-          clearInterval(progressInterval);
+          if (progressIntervalRef.current) {
+            clearInterval(progressIntervalRef.current);
+          }
           return 100;
         }
         return prev + 3.33;
@@ -64,10 +70,14 @@ export default function CameraScreen() {
     }, 100);
 
     // Simulate scanning process
-    setTimeout(() => {
-      rotation.stop();
+    scanTimeoutRef.current = setTimeout(() => {
+      if (rotationLoop.current) {
+        rotationLoop.current.stop();
+      }
       rotateAnim.setValue(0);
-      clearInterval(progressInterval);
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
       setProcessing(false);
       setProgress(0);
 
@@ -85,7 +95,7 @@ export default function CameraScreen() {
   const takePicture = async () => {
     // Check user's scan limit
     // For now, we assume a "free" user who gets 1 scan.
-    if (scanCount >= 5) {
+    if (scanCount >= 100) {
       router.push("/subscription");
       return;
     }
@@ -115,6 +125,20 @@ export default function CameraScreen() {
 
   const retakePhoto = () => {
     setPhoto(null);
+    setProcessing(false);
+    setProgress(0);
+
+    // Stop and clear all timers and animations
+    if (rotationLoop.current) {
+      rotationLoop.current.stop();
+    }
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+    }
+    if (scanTimeoutRef.current) {
+      clearTimeout(scanTimeoutRef.current);
+    }
+
     // It's good practice to reset the animation value as well
     rotateAnim.setValue(0);
   };
@@ -180,9 +204,15 @@ export default function CameraScreen() {
       <View style={[styles.container, { backgroundColor: colors.white }]}>
         {/* Header */}
         <View style={styles.header}>
-          <Pressable onPress={retakePhoto}>
+          <Pressable onPress={retakePhoto} style={styles.retakeButtonContainer}>
+            <Ionicons
+              name="refresh"
+              size={20}
+              color={colors.primary[600]}
+              style={styles.retakeIcon}
+            />
             <Text style={[styles.retakeButton, { color: colors.primary[600] }]}>
-              ✕ Retake
+              Retake
             </Text>
           </Pressable>
         </View>
@@ -298,6 +328,13 @@ const styles = StyleSheet.create({
     paddingTop: 56,
     paddingBottom: Spacing[6],
     paddingHorizontal: Spacing[6],
+  },
+  retakeButtonContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  retakeIcon: {
+    marginRight: Spacing[2],
   },
   retakeButton: {
     fontSize: FontSizes.lg,
