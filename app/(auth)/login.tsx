@@ -3,6 +3,7 @@ import { Link, useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Image,
   Pressable,
@@ -11,9 +12,11 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useDispatch } from "react-redux";
 import { BorderRadius, Fonts, FontSizes, Spacing } from "../../constants/theme";
-import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
+import { useLoginMutation } from "../../store/api/authApiSlice";
+import { setCredentials } from "../../store/features/auth/authSlice";
 
 // @ts-expect-error: Metro provides asset module typing
 import googleIcon from "../../assets/images/google.png";
@@ -24,10 +27,12 @@ WebBrowser.maybeCompleteAuthSession();
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { signIn } = useAuth();
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { colors, theme } = useTheme();
+
+  const [login, { isLoading }] = useLoginMutation();
 
   // Google Auth setup
   const [request, response, promptAsync] = Google.useAuthRequest({
@@ -45,13 +50,23 @@ export default function LoginScreen() {
     }
   }, [response]);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert("Error", "Please fill in all fields.");
       return;
     }
-    console.log("Logging in with:", { email, password });
-    signIn();
+    try {
+      const { accessToken, user } = await login({ email, password }).unwrap();
+      console.log("Login successful", { accessToken, user });
+      dispatch(setCredentials({ token: accessToken, user }));
+      router.replace("/(tabs)/home");
+    } catch (err) {
+      Alert.alert(
+        "Login Failed",
+        "Could not log in. Please check your credentials."
+      );
+      console.error(err);
+    }
   };
 
   return (
@@ -96,8 +111,15 @@ export default function LoginScreen() {
       <Pressable
         style={[styles.button, { backgroundColor: colors.primary[500] }]}
         onPress={handleLogin}
+        disabled={isLoading}
       >
-        <Text style={[styles.buttonText, { color: colors.white }]}>Login</Text>
+        {isLoading ? (
+          <ActivityIndicator color={colors.white} />
+        ) : (
+          <Text style={[styles.buttonText, { color: colors.white }]}>
+            Login
+          </Text>
+        )}
       </Pressable>
 
       <View style={styles.dividerContainer}>

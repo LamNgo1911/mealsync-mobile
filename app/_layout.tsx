@@ -6,13 +6,12 @@ import {
   useFonts,
 } from "@expo-google-fonts/inter";
 import { PlayfairDisplay_700Bold } from "@expo-google-fonts/playfair-display";
-import { Stack } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-import { Provider } from "react-redux";
-import { AuthProvider } from "../context/AuthContext";
+import { Provider, useSelector } from "react-redux";
 import { ThemeProvider, useTheme } from "../context/ThemeContext";
-import { store } from "../store/store";
+import { RootState, store } from "../store/store";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -41,9 +40,7 @@ export default function RootLayout() {
   return (
     <Provider store={store}>
       <ThemeProvider>
-        <AuthProvider>
-          <RootLayoutNav />
-        </AuthProvider>
+        <RootLayoutNav />
       </ThemeProvider>
     </Provider>
   );
@@ -51,6 +48,20 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const { colors } = useTheme();
+  const { token } = useSelector((state: RootState) => state.auth);
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    const inTabsGroup = segments[0] === "(tabs)";
+
+    if (token && !inTabsGroup) {
+      router.replace("/(tabs)/home");
+    } else if (!token) {
+      router.replace("/(auth)/login");
+    }
+  }, [token, segments, router]);
+
   return (
     <Stack
       screenOptions={{

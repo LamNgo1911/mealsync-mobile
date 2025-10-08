@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Image,
   Pressable,
@@ -11,6 +12,7 @@ import {
 } from "react-native";
 import { BorderRadius, Fonts, FontSizes, Spacing } from "../../constants/theme";
 import { useTheme } from "../../context/ThemeContext";
+import { useRegisterMutation } from "../../store/api/authApiSlice";
 // @ts-expect-error: Metro provides asset module typing
 import appIcon from "../../assets/images/logo.png";
 
@@ -21,16 +23,27 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState("");
   const { colors } = useTheme();
 
-  const handleRegister = () => {
+  const [register, { isLoading }] = useRegisterMutation();
+
+  const handleRegister = async () => {
     if (!name || !email || !password) {
       Alert.alert("Error", "Please fill in all fields.");
       return;
     }
-    // TODO: Add actual registration logic here
-    console.log("Registering with:", { name, email, password });
-
-    // Navigate to the preferences screen after registration
-    router.push("/(auth)/preferences");
+    try {
+      await register({ name, email, password }).unwrap();
+      Alert.alert(
+        "Registration Successful",
+        "You can now log in with your new account."
+      );
+      router.replace("/(auth)/login");
+    } catch (err) {
+      Alert.alert(
+        "Registration Failed",
+        "Could not create account. Please try again."
+      );
+      console.error(err);
+    }
   };
 
   return (
@@ -88,10 +101,15 @@ export default function RegisterScreen() {
       <Pressable
         style={[styles.button, { backgroundColor: colors.primary[500] }]}
         onPress={handleRegister}
+        disabled={isLoading}
       >
-        <Text style={[styles.buttonText, { color: colors.white }]}>
-          Register
-        </Text>
+        {isLoading ? (
+          <ActivityIndicator color={colors.white} />
+        ) : (
+          <Text style={[styles.buttonText, { color: colors.white }]}>
+            Register
+          </Text>
+        )}
       </Pressable>
 
       <Pressable onPress={() => router.back()}>
