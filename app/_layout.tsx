@@ -6,7 +6,6 @@ import {
   useFonts,
 } from "@expo-google-fonts/inter";
 import { PlayfairDisplay_700Bold } from "@expo-google-fonts/playfair-display";
-import { StripeProvider } from "@stripe/stripe-react-native";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
@@ -42,11 +41,9 @@ export default function RootLayout() {
   return (
     <Provider store={store}>
       <ThemeProvider>
-        <StripeProvider publishableKey="YOUR_STRIPE_PUBLISHABLE_KEY">
-          <AuthProvider>
-            <RootLayoutNav />
-          </AuthProvider>
-        </StripeProvider>
+        <AuthProvider>
+          <RootLayoutNav />
+        </AuthProvider>
       </ThemeProvider>
     </Provider>
   );
