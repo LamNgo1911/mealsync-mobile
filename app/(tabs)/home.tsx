@@ -1,6 +1,5 @@
 import { Camera } from "expo-camera";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Header } from "../../components/Header";
 import { RecipeSection } from "../../components/RecipeSection";
@@ -12,19 +11,18 @@ import {
   Spacing,
 } from "../../constants/theme";
 import { useTheme } from "../../context/ThemeContext";
-import { getRecommendedRecipes } from "../../data/recipes";
-
-const RECOMMENDED_MEALS = getRecommendedRecipes();
+import { useGetRecipesQuery } from "../../store/api/recipeApiSlice";
 
 export default function HomeScreen() {
   const router = useRouter();
   const { colors } = useTheme();
-  const [loading, setLoading] = useState(true);
+  const {
+    data: recommendedRecipes,
+    isLoading: isLoadingRecommended,
+    isError: isErrorRecommended,
+  } = useGetRecipesQuery({ page: 1, limit: 5 });
 
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2000);
-    return () => clearTimeout(timer);
-  }, []);
+  console.log(recommendedRecipes);
 
   const takePhoto = async () => {
     const { status } = await Camera.getCameraPermissionsAsync();
@@ -94,8 +92,8 @@ export default function HomeScreen() {
         {/* Recommended Meals Section */}
         <RecipeSection
           title="Recommended Meals"
-          recipes={RECOMMENDED_MEALS}
-          loading={loading}
+          recipes={recommendedRecipes?.recipes ?? []}
+          loading={isLoadingRecommended}
         />
       </ScrollView>
     </View>

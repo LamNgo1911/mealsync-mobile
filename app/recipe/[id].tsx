@@ -20,7 +20,7 @@ import {
 } from "../../constants/theme";
 import { useTheme } from "../../context/ThemeContext";
 import { getRecipeById } from "../../data/recipes";
-import { RecipeIngredient } from "../../types";
+import { RecipeIngredient } from "../../types/recipe";
 
 // Client-side state for checkboxes
 type IngredientState = RecipeIngredient & { checked: boolean };

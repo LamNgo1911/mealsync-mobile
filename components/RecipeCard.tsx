@@ -9,7 +9,7 @@ import {
   Spacing,
 } from "../constants/theme";
 import { useTheme } from "../context/ThemeContext";
-import { Recipe } from "../types";
+import { Recipe } from "../types/recipe";
 
 export type RecipeCardProps = {
   recipe: Recipe;

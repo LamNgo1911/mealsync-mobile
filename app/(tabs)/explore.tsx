@@ -15,7 +15,7 @@ import { SkeletonCard } from "../../components/SkeletonCard";
 import { BorderRadius, Fonts, FontSizes, Spacing } from "../../constants/theme";
 import { useTheme } from "../../context/ThemeContext";
 import { getExploreRecipes } from "../../data/recipes";
-import { Recipe } from "../../types";
+import { Recipe } from "../../types/recipe";
 
 type SkeletonItem = { id: string; skeleton: true };
 type ListItem = Recipe | SkeletonItem;
