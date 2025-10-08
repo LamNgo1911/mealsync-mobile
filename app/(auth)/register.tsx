@@ -1,3 +1,4 @@
+import { UserRole } from "@/types/user";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -31,7 +32,7 @@ export default function RegisterScreen() {
       return;
     }
     try {
-      await register({ name, email, password }).unwrap();
+      await register({ name, email, role: UserRole.USER, password }).unwrap();
       Alert.alert(
         "Registration Successful",
         "You can now log in with your new account."

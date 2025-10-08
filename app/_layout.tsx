@@ -53,11 +53,15 @@ function RootLayoutNav() {
   const router = useRouter();
 
   useEffect(() => {
-    const inTabsGroup = segments[0] === "(tabs)";
+    const inAuthGroup = segments[0] === "(auth)";
 
-    if (token && !inTabsGroup) {
+    if (token && inAuthGroup) {
+      // User is logged in but is in the auth group (e.g. login/register page).
+      // Redirect them away to the main app.
       router.replace("/(tabs)/home");
-    } else if (!token) {
+    } else if (!token && !inAuthGroup) {
+      // User is not logged in and is trying to access a protected route.
+      // Redirect them to the login page.
       router.replace("/(auth)/login");
     }
   }, [token, segments, router]);
