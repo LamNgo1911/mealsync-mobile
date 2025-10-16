@@ -92,7 +92,7 @@ export default function HomeScreen() {
         {/* Recommended Meals Section */}
         <RecipeSection
           title="Recommended Meals"
-          recipes={recommendedRecipes?.recipes ?? []}
+          recipes={recommendedRecipes?.data ?? []}
           loading={isLoadingRecommended}
         />
       </ScrollView>
