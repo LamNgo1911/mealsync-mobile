@@ -33,7 +33,7 @@ function RecipeCardComponent({ recipe, onPress }: RecipeCardProps) {
         <Image
           source={source}
           contentFit="cover"
-          style={styles.image}
+          style={[styles.image, { backgroundColor: colors.neutral[100] }]}
           transition={150}
         />
       </View>

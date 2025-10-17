@@ -16,7 +16,10 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.lamngo.mealsync",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
       }
     },
     "android": {
@@ -24,7 +27,8 @@
         "foregroundImage": "./assets/images/logo.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.lamngo.mealsync"
+      "package": "com.lamngo.mealsync",
+      "usesCleartextTraffic": true
     },
     "web": {
       "bundler": "metro",
@@ -32,8 +36,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router",
-      "expo-font"
+      "expo-router"
     ],
     "experiments": {
       "typedRoutes": true

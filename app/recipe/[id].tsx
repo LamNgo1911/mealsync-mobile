@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Alert,
   Pressable,
@@ -19,7 +19,7 @@ import {
   Spacing,
 } from "../../constants/theme";
 import { useTheme } from "../../context/ThemeContext";
-import { getRecipeById } from "../../data/recipes";
+import { useGetRecipeByIdQuery } from "../../store/api/recipeApiSlice";
 import { RecipeIngredient } from "../../types/recipe";
 
 // Client-side state for checkboxes
@@ -30,16 +30,28 @@ export default function RecipeDetail() {
   const { colors } = useTheme();
   const [ingredients, setIngredients] = useState<IngredientState[]>([]);
 
-  const recipe = getRecipeById(id as string);
+  console.log("Recipe ID from params:", id);
+
+  const {
+    data: recipe,
+    isLoading,
+    isError,
+  } = useGetRecipeByIdQuery(id as string);
+
+  console.log("API Query State:", {
+    isLoading,
+    isError,
+    recipe,
+  });
 
   // Initialize ingredients state when recipe loads
-  useState(() => {
+  useEffect(() => {
     if (recipe) {
       setIngredients(
         recipe.ingredients.map((ing) => ({ ...ing, checked: false }))
       );
     }
-  });
+  }, [recipe]);
 
   const toggleIngredient = (ingredientName: string) => {
     setIngredients((prev) =>
@@ -59,7 +71,20 @@ export default function RecipeDetail() {
     );
   };
 
-  if (!recipe) {
+  if (isLoading) {
+    return (
+      <View
+        style={[styles.notFoundContainer, { backgroundColor: colors.white }]}
+      >
+        <Text style={[styles.notFoundText, { color: colors.neutral[500] }]}>
+          Loading...
+        </Text>
+      </View>
+    );
+  }
+  console.log("Recipe:", recipe);
+
+  if (isError || !recipe) {
     return (
       <View
         style={[styles.notFoundContainer, { backgroundColor: colors.white }]}
@@ -169,6 +194,94 @@ export default function RecipeDetail() {
               </Text>
               <Text style={[styles.infoText, { color: colors.neutral[600] }]}>
                 Difficulty
+              </Text>
+            </View>
+          </View>
+
+          {/* Nutrition Info */}
+          <View style={styles.infoContainer}>
+            <View
+              style={[
+                styles.infoCard,
+                {
+                  backgroundColor: colors.neutral[50],
+                  borderColor: colors.neutral[200],
+                },
+              ]}
+            >
+              <Ionicons
+                name="flame-outline"
+                size={24}
+                color={colors.primary[500]}
+              />
+              <Text style={[styles.infoValue, { color: colors.neutral[900] }]}>
+                {recipe.calories}
+              </Text>
+              <Text style={[styles.infoText, { color: colors.neutral[600] }]}>
+                Calories
+              </Text>
+            </View>
+            <View
+              style={[
+                styles.infoCard,
+                {
+                  backgroundColor: colors.neutral[50],
+                  borderColor: colors.neutral[200],
+                },
+              ]}
+            >
+              <Ionicons
+                name="fish-outline"
+                size={24}
+                color={colors.primary[500]}
+              />
+              <Text style={[styles.infoValue, { color: colors.neutral[900] }]}>
+                {recipe.protein}g
+              </Text>
+              <Text style={[styles.infoText, { color: colors.neutral[600] }]}>
+                Protein
+              </Text>
+            </View>
+            <View
+              style={[
+                styles.infoCard,
+                {
+                  backgroundColor: colors.neutral[50],
+                  borderColor: colors.neutral[200],
+                },
+              ]}
+            >
+              <Ionicons
+                name="leaf-outline"
+                size={24}
+                color={colors.primary[500]}
+              />
+              <Text style={[styles.infoValue, { color: colors.neutral[900] }]}>
+                {recipe.carbohydrates}g
+              </Text>
+              <Text style={[styles.infoText, { color: colors.neutral[600] }]}>
+                Carbs
+              </Text>
+            </View>
+            <View
+              style={[
+                styles.infoCard,
+                {
+                  backgroundColor: colors.neutral[50],
+                  borderColor: colors.neutral[200],
+                },
+              ]}
+            >
+              <Ionicons
+                name="water-outline"
+                size={24}
+                color={colors.primary[500]}
+              />
+              <Text style={[styles.infoValue, { color: colors.neutral[900] }]}>
+                {recipe.fat}g
+              </Text>
+              <Text style={[styles.infoText, { color: colors.neutral[600] }]}>
+                Fat
               </Text>
             </View>
           </View>
