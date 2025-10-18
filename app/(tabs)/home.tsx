@@ -22,8 +22,6 @@ export default function HomeScreen() {
     isError: isErrorRecommended,
   } = useGetRecipesQuery({ page: 1, limit: 5 });
 
-  console.log(recommendedRecipes);
-
   const takePhoto = async () => {
     const { status } = await Camera.getCameraPermissionsAsync();
     if (status !== "granted") {

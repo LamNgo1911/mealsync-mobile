@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dimensions,
   FlatList,
@@ -14,90 +14,50 @@ import { RecipeCard } from "../../components/RecipeCard";
 import { SkeletonCard } from "../../components/SkeletonCard";
 import { BorderRadius, Fonts, FontSizes, Spacing } from "../../constants/theme";
 import { useTheme } from "../../context/ThemeContext";
-import { getExploreRecipes } from "../../data/recipes";
+import { useGetRecipesQuery } from "../../store/api/recipeApiSlice";
 import { Recipe } from "../../types/recipe";
 
 type SkeletonItem = { id: string; skeleton: true };
 type ListItem = Recipe | SkeletonItem;
 
-const ALL_RECIPES = getExploreRecipes();
 const PAGE_SIZE = 6;
 const { width } = Dimensions.get("window");
-
-// Simulate an API call that matches the backend pagination structure
-const fetchRecipes = async (
-  page: number,
-  limit: number,
-  query: string
-): Promise<{
-  data: Recipe[];
-  totalPages: number;
-}> => {
-  const q = query.trim().toLowerCase();
-  const filtered = ALL_RECIPES.filter(
-    (r) =>
-      !q ||
-      r.name.toLowerCase().includes(q) ||
-      r.tags.some((tag) => tag.toLowerCase().includes(q))
-  );
-
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 800));
-
-  const offset = (page - 1) * limit;
-  const pageData = filtered.slice(offset, offset + limit);
-  const totalPages = Math.max(1, Math.ceil(filtered.length / limit));
-
-  return {
-    data: pageData,
-    totalPages,
-  };
-};
 
 export default function ExploreScreen() {
   const router = useRouter();
   const { colors } = useTheme();
   const [query, setQuery] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+
+  const {
+    data: recipeData,
+    isLoading,
+    isFetching,
+  } = useGetRecipesQuery({
+    page,
+    limit: PAGE_SIZE,
+    query: debouncedQuery,
+  });
+
+  const recipes = recipeData?.data ?? [];
+  const totalPages = recipeData?.totalPages ?? 1;
 
   // refs
   const outerFlatListRef = useRef<FlatList<number>>(null);
-  const lastLoadedPageRef = useRef<number>(0);
-
-  const loadRecipes = useCallback(
-    async (newPage: number) => {
-      setLoading(true);
-      try {
-        const response = await fetchRecipes(newPage, PAGE_SIZE, query);
-        setRecipes(response.data);
-        setTotalPages(response.totalPages);
-        setPage(newPage);
-        lastLoadedPageRef.current = newPage;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [query]
-  );
 
   useEffect(() => {
-    // Debounce search query and reset to page 1
+    // Debounce search query
     const handler = setTimeout(() => {
-      outerFlatListRef.current?.scrollToIndex({ index: 0, animated: true });
-      loadRecipes(1);
-    }, 300);
+      setPage(1); // Reset to page 1 on new search
+      setDebouncedQuery(query);
+      if (outerFlatListRef.current) {
+        outerFlatListRef.current.scrollToIndex({ index: 0, animated: false });
+      }
+    }, 500); // 500ms delay
 
     return () => clearTimeout(handler);
-  }, [query, loadRecipes]);
-
-  // Initial load
-  useEffect(() => {
-    loadRecipes(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // run once on mount
+  }, [query]);
 
   const createSkeletonsForPage = (pageNum: number) =>
     Array.from({ length: PAGE_SIZE }).map((_, i) => ({
@@ -106,7 +66,7 @@ export default function ExploreScreen() {
     })) as SkeletonItem[];
 
   const dataForList: ListItem[] =
-    loading && recipes.length === 0
+    isLoading && recipes.length === 0
       ? Array.from({ length: PAGE_SIZE }).map((_, i) => ({
           id: `s-init-${i}`,
           skeleton: true,
@@ -121,7 +81,7 @@ export default function ExploreScreen() {
         <Pressable
           key={p}
           onPress={() => {
-            loadRecipes(p);
+            setPage(p);
             outerFlatListRef.current?.scrollToIndex({
               index: p - 1,
               animated: true,
@@ -181,15 +141,15 @@ export default function ExploreScreen() {
         })}
         onMomentumScrollEnd={(e) => {
           const newPage = Math.round(e.nativeEvent.contentOffset.x / width) + 1;
-          if (newPage !== lastLoadedPageRef.current) {
-            loadRecipes(newPage);
-          } else {
+          if (newPage !== page) {
             setPage(newPage);
           }
         }}
         renderItem={({ item: pageNum }) => {
           const pageData =
-            page === pageNum ? dataForList : createSkeletonsForPage(pageNum);
+            isFetching && pageNum !== page
+              ? createSkeletonsForPage(pageNum)
+              : dataForList;
 
           return (
             <View style={{ width, flex: 1 }}>

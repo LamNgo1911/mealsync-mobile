@@ -82,7 +82,6 @@ export default function RecipeDetail() {
       </View>
     );
   }
-  console.log("Recipe:", recipe);
 
   if (isError || !recipe) {
     return (
@@ -98,12 +97,17 @@ export default function RecipeDetail() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.white }]}>
-      <Header title={recipe.name || "Recipe"} showBackButton />
+      <Header showBackButton />
 
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
       >
+        {/* Recipe Title */}
+        <Text style={[styles.recipeTitle, { color: colors.neutral[900] }]}>
+          {recipe.name}
+        </Text>
+
         {/* Recipe Image */}
         <Image
           source={recipe.imageUrl}
@@ -417,6 +421,13 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 256,
   },
+  recipeTitle: {
+    fontSize: FontSizes["2xl"],
+    fontFamily: Fonts.bold,
+    fontWeight: FontWeights.bold,
+    marginHorizontal: Spacing[6],
+    marginBottom: Spacing[4],
+  },
   contentContainer: {
     padding: Spacing[6],
   },
@@ -456,7 +467,7 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontFamily: Fonts.regular,
-    fontSize: FontSizes.sm,
+    fontSize: FontSizes.xs,
     marginBottom: Spacing[1],
   },
   infoValue: {
