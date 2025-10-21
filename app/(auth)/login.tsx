@@ -57,7 +57,7 @@ export default function LoginScreen() {
     }
     try {
       const { accessToken, user } = await login({ email, password }).unwrap();
-      console.log("Login successful", { accessToken, user });
+      
       dispatch(setCredentials({ token: accessToken, user }));
       router.replace("/(tabs)/home");
     } catch (err) {

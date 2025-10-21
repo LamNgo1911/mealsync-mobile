@@ -38,12 +38,6 @@ export default function RecipeDetail() {
     isError,
   } = useGetRecipeByIdQuery(id as string);
 
-  console.log("API Query State:", {
-    isLoading,
-    isError,
-    recipe,
-  });
-
   // Initialize ingredients state when recipe loads
   useEffect(() => {
     if (recipe) {

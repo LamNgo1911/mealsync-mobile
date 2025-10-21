@@ -21,11 +21,13 @@ import {
 } from "../constants/theme";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import { useDetectIngredientsMutation } from "../store/api/ingredientRecognitionApiSlice";
+import { useGenerateRecipesMutation } from "../store/api/recipeApiSlice";
 
 export default function CameraScreen() {
   const router = useRouter();
   const { colors } = useTheme();
-  const { scanCount, incrementScanCount } = useAuth();
+  const { scanCount, incrementScanCount, user } = useAuth();
   const cameraRef = useRef<CameraView>(null);
   const [photo, setPhoto] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
@@ -36,6 +38,9 @@ export default function CameraScreen() {
   const progressIntervalRef = useRef<number | null>(null);
   const scanTimeoutRef = useRef<number | null>(null);
 
+  const [detectIngredients] = useDetectIngredientsMutation();
+  const [generateRecipes] = useGenerateRecipesMutation();
+
   useEffect(() => {
     // We only need to request permission if it's not determined yet.
     if (permission && !permission.granted && permission.canAskAgain) {
@@ -43,7 +48,7 @@ export default function CameraScreen() {
     }
   }, [permission, requestPermission]);
 
-  const startScanning = () => {
+  const startScanning = async (imageUri: string) => {
     setProcessing(true);
     setProgress(0);
 
@@ -69,8 +74,42 @@ export default function CameraScreen() {
       });
     }, 100);
 
-    // Simulate scanning process
-    scanTimeoutRef.current = setTimeout(() => {
+    try {
+      // Create FormData for multipart/form-data upload
+      const formData = new FormData();
+
+      // Extract filename from URI
+      const filename = imageUri.split('/').pop() || 'photo.jpg';
+
+      // Add image to FormData
+      formData.append('image', {
+        uri: imageUri,
+        name: filename,
+        type: 'image/jpeg',
+      } as any);
+
+      // Step 1: Detect ingredients from image
+      const detectionResponse = await detectIngredients(formData).unwrap();
+
+      // Extract ingredient names from response
+      const ingredientList = detectionResponse.data.ingredients.map(
+        (ing) => ing.name
+      );
+
+      // Step 2: Generate recipes based on detected ingredients and user preferences
+      const userPreference = user?.userPreference
+        ? {
+            dietaryRestrictions: user.userPreference.dietaryRestrictions,
+            cuisinePreferences: user.userPreference.preferredCuisines,
+          }
+        : undefined;
+
+      const recipesResponse = await generateRecipes({
+        ingredients: ingredientList,
+        userPreference,
+      }).unwrap();
+
+      // Stop animations
       if (rotationLoop.current) {
         rotationLoop.current.stop();
       }
@@ -81,15 +120,41 @@ export default function CameraScreen() {
       setProcessing(false);
       setProgress(0);
 
-      // Navigate to suggestions screen with mock data
-      const mockIngredients = "Tomato, Cheese, Basil, Olive Oil";
+      // Navigate to suggestions screen with detected ingredients and generated recipes
       router.push({
         pathname: "/recipe-suggestions",
-        params: { ingredients: mockIngredients },
+        params: {
+          ingredients: ingredientList.join(", "),
+          recipes: JSON.stringify(recipesResponse.data),
+        },
       });
+
       // Reset photo state after navigating away
       setPhoto(null);
-    }, 3000);
+    } catch (error) {
+      // Stop animations
+      if (rotationLoop.current) {
+        rotationLoop.current.stop();
+      }
+      rotateAnim.setValue(0);
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
+      setProcessing(false);
+      setProgress(0);
+
+      let message = "Failed to process image. Please try again.";
+      if (error instanceof Error) {
+        message = error.message;
+      } else if (typeof error === 'object' && error !== null && 'data' in error) {
+        const apiError = error as any;
+        message = apiError.data?.message || message;
+      }
+      Alert.alert("Error", message);
+
+      // Reset photo so user can retake
+      setPhoto(null);
+    }
   };
 
   const takePicture = async () => {
@@ -107,7 +172,7 @@ export default function CameraScreen() {
         if (result?.uri) {
           incrementScanCount(); // Increment scan count after successful photo
           setPhoto(result.uri);
-          setTimeout(() => startScanning(), 500);
+          setTimeout(() => startScanning(result.uri), 500);
         } else {
           Alert.alert("Error", "No photo URI received from camera result.");
         }

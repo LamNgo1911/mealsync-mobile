@@ -112,7 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  useProtectedRoute(user ? user.id : null);
+  // useProtectedRoute(user ? user.id : null);
 
   const authContextValue: AuthContextType = useMemo(
     () => ({
