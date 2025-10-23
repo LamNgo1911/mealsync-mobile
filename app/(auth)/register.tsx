@@ -32,6 +32,10 @@ export default function RegisterScreen() {
       return;
     }
     try {
+      console.log("name: ", name);
+      console.log("role: ", UserRole.USER);
+      console.log("password: ", password);
+      
       await register({ name, email, role: UserRole.USER, password }).unwrap();
       Alert.alert(
         "Registration Successful",
