@@ -102,11 +102,6 @@ export default function CameraScreen() {
     );
     rotationLoop.current.start();
 
-    // Simulate progress
-    progressIntervalRef.current = setInterval(() => {
-      setProgress((prev) => (prev >= 100 ? 100 : prev + 3.33));
-    }, 100);
-
     try {
       const formData = new FormData();
       formData.append("image", {
@@ -115,8 +110,10 @@ export default function CameraScreen() {
         type: "image/jpeg",
       } as any);
 
-      // Detect ingredients
+      // Step 1: Detect ingredients (0% -> 50%)
+      setProgress(10); // Starting detection
       const detectionResponse = await detectIngredients(formData).unwrap();
+      setProgress(50); // Detection complete
 
       // Extract ingredients from response: { success: true, data: ["ingredient1", "ingredient2", ...] }
       const ingredients = detectionResponse.data || [];
@@ -127,11 +124,13 @@ export default function CameraScreen() {
         throw new Error("No ingredients detected.");
       }
 
-      // Generate recipes
+      // Step 2: Generate recipes (50% -> 100%)
+      setProgress(60); // Starting recipe generation
       const recipesResponse = await generateRecipes({
         ingredients,
         userPreference: mapUserPreferenceForRecipe(user?.userPreference),
       }).unwrap();
+      setProgress(100); // Complete
 
       router.push({
         pathname: "/recipe-suggestions",
