@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   },
   title: {
     marginTop: Spacing[3],
-    fontSize: FontSizes.lg,
+    fontSize: FontSizes.base,
     fontWeight: FontWeights.semibold,
     fontFamily: Fonts.semibold,
   },
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     gap: Spacing[2],
   },
   detailText: {
-    fontSize: FontSizes.base,
+    fontSize: FontSizes.sm,
     fontFamily: Fonts.regular,
   },
 });

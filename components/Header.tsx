@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 // @ts-expect-error: Metro provides asset module typing
@@ -8,9 +9,14 @@ import { useTheme } from "../context/ThemeContext";
 interface HeaderProps {
   title?: string;
   showBackButton?: boolean;
+  showSettingsButton?: boolean;
 }
 
-export function Header({ title, showBackButton = false }: HeaderProps) {
+export function Header({
+  title,
+  showBackButton = false,
+  showSettingsButton = true,
+}: HeaderProps) {
   const router = useRouter();
   const { colors } = useTheme();
 
@@ -44,6 +50,21 @@ export function Header({ title, showBackButton = false }: HeaderProps) {
           >
             {title}
           </Text>
+        )}
+
+        {showSettingsButton && (
+          <View style={styles.settingsContainer}>
+            <Pressable
+              onPress={() => router.push("/settings")}
+              style={styles.settingsButton}
+            >
+              <Ionicons
+                name="settings-outline"
+                size={28}
+                color={colors.neutral[700]}
+              />
+            </Pressable>
+          </View>
         )}
       </View>
     </View>
@@ -80,7 +101,7 @@ const styles = StyleSheet.create({
   },
   backButtonContainer: {
     position: "absolute",
-    left: -10,
+    left: -14,
     justifyContent: "center",
     width: 48,
     height: 48,
@@ -88,5 +109,17 @@ const styles = StyleSheet.create({
   },
   backButton: {
     fontSize: FontSizes["3xl"],
+  },
+  settingsContainer: {
+    position: "absolute",
+    right: -14,
+    height: "100%",
+    justifyContent: "center",
+  },
+  settingsButton: {
+    width: 48,
+    height: 48,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

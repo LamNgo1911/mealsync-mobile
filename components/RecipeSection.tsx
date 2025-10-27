@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import {
   BorderRadius,
   Fonts,
@@ -43,35 +43,60 @@ export function RecipeSection({
   };
 
   if (layout === "grid") {
-    const renderGridItems = () => {
-      if (loading) {
-        return Array.from({ length: 4 }).map((_, index) => (
-          <View key={`skeleton-${index}`} style={styles.gridItem}>
-            <SkeletonCard />
-          </View>
-        ));
-      }
-
-      return recipes.map((item) => (
-        <View key={item.id} style={styles.gridItem}>
-          <RecipeCard recipe={item} onPress={() => handleRecipePress(item)} />
-        </View>
-      ));
-    };
+    // Show up to 4 recipes
+    const displayRecipes = recipes.slice(0, 4);
 
     return (
       <View style={styles.container}>
-        <Text style={[styles.title, { color: colors.neutral[900] }]}>
-          {title}
-        </Text>
-        <View style={styles.gridContainer}>{renderGridItems()}</View>
+        <View
+          style={[
+            styles.gridBlock,
+            {
+              backgroundColor: colors.white,
+              borderColor: colors.neutral[200],
+            },
+          ]}
+        >
+          <View style={styles.gridHeader}>
+            <Text style={[styles.title, { color: colors.neutral[900] }]}>
+              {title}
+            </Text>
+            <Pressable onPress={() => console.log("View all pressed")}>
+              <Text style={[styles.viewAllText, { color: colors.primary[500] }]}>
+                View All
+              </Text>
+            </Pressable>
+          </View>
+          <ScrollView
+            style={styles.gridScrollView}
+            showsVerticalScrollIndicator={true}
+            nestedScrollEnabled={true}
+          >
+            <View style={styles.gridContainer}>
+              {loading
+                ? Array.from({ length: 4 }).map((_, index) => (
+                    <View key={`skeleton-${index}`} style={styles.gridItem}>
+                      <SkeletonCard />
+                    </View>
+                  ))
+                : displayRecipes.map((item) => (
+                    <View key={item.id} style={styles.gridItem}>
+                      <RecipeCard
+                        recipe={item}
+                        onPress={() => handleRecipePress(item)}
+                      />
+                    </View>
+                  ))}
+            </View>
+          </ScrollView>
+        </View>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={[styles.title, { color: colors.neutral[900] }]}>
+    <View style={styles.listContainer}>
+      <Text style={[styles.listTitle, { color: colors.neutral[900] }]}>
         {title}
       </Text>
 
@@ -119,20 +144,59 @@ export function RecipeSection({
 }
 
 const styles = StyleSheet.create({
-  container: {},
+  container: {
+    paddingVertical: Spacing[4],
+  },
+  listContainer: {},
   title: {
-    fontSize: FontSizes["2xl"],
+    fontSize: FontSizes["xl"],
+    fontWeight: FontWeights.bold,
+    fontFamily: Fonts.bold,
+  },
+  listTitle: {
+    fontSize: FontSizes.base,
     fontWeight: FontWeights.bold,
     fontFamily: Fonts.bold,
     marginBottom: Spacing[4],
     paddingHorizontal: Spacing[6],
   },
+  gridBlock: {
+    marginHorizontal: Spacing[4],
+    borderRadius: BorderRadius.xl,
+    borderWidth: 1,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  gridHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: Spacing[5],
+    paddingTop: Spacing[5],
+    marginBottom: Spacing[4],
+  },
+  viewAllText: {
+    fontSize: FontSizes.sm,
+    fontWeight: FontWeights.semibold,
+    fontFamily: Fonts.semibold,
+  },
+  gridScrollView: {
+    maxHeight: 280, // Show 1 row (2 recipes), scroll to see the next row
+  },
   gridContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    paddingHorizontal: Spacing[6],
-    rowGap: Spacing[6],
+    paddingHorizontal: Spacing[4],
+    paddingBottom: Spacing[4],
+    rowGap: Spacing[4],
   },
   gridItem: {
     width: "48%",
