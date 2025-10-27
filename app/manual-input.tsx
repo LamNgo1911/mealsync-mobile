@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
+  Animated,
   FlatList,
   Pressable,
   StyleSheet,
@@ -16,7 +17,12 @@ import {
   FontWeights,
   Spacing,
 } from "../constants/theme";
+import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import {
+  mapUserPreferenceForRecipe,
+  useGenerateRecipesMutation,
+} from "../store/api/recipeApiSlice";
 
 type Ingredient = {
   id: string;
@@ -26,8 +32,16 @@ type Ingredient = {
 export default function ManualInputScreen() {
   const router = useRouter();
   const { colors } = useTheme();
+  const { user } = useAuth();
   const [inputText, setInputText] = useState("");
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+  const [processing, setProcessing] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  const rotateAnim = useRef(new Animated.Value(0)).current;
+  const rotationLoop = useRef<Animated.CompositeAnimation | null>(null);
+
+  const [generateRecipes] = useGenerateRecipesMutation();
 
   const addIngredient = () => {
     if (inputText.trim()) {
@@ -44,20 +58,98 @@ export default function ManualInputScreen() {
     setIngredients(ingredients.filter((item) => item.id !== id));
   };
 
-  const findRecipes = () => {
+  const findRecipes = async () => {
     if (ingredients.length === 0) {
       alert("Please add at least one ingredient");
       return;
     }
-    alert(
-      `Searching recipes with: ${ingredients.map((i) => i.name).join(", ")}`
+
+    setProcessing(true);
+    setProgress(0);
+
+    // Start rotation animation
+    rotationLoop.current = Animated.loop(
+      Animated.timing(rotateAnim, {
+        toValue: 1,
+        duration: 2000,
+        useNativeDriver: true,
+      })
     );
-    router.back();
+    rotationLoop.current.start();
+
+    try {
+      // Generate recipes
+      setProgress(50);
+      const ingredientNames = ingredients.map((i) => i.name);
+      const recipesResponse = await generateRecipes({
+        ingredients: ingredientNames,
+        userPreference: mapUserPreferenceForRecipe(user?.userPreference),
+      }).unwrap();
+      setProgress(100);
+
+      router.push({
+        pathname: "/recipe-suggestions",
+        params: {
+          ingredients: ingredientNames.join(", "),
+          recipes: JSON.stringify(recipesResponse.data),
+        },
+      });
+
+      setProcessing(false);
+    } catch (error) {
+      console.error("Recipe generation error:", error);
+      alert("Failed to generate recipes. Please try again.");
+      setProcessing(false);
+    } finally {
+      if (rotationLoop.current) rotationLoop.current.stop();
+      rotateAnim.setValue(0);
+    }
   };
+
+  const spin = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "360deg"],
+  });
 
   return (
     <View style={[styles.container, { backgroundColor: colors.white }]}>
       <Header title="Manual Input" showBackButton />
+
+      {processing && (
+        <View
+          style={[
+            styles.processingOverlay,
+            { backgroundColor: "rgba(0, 0, 0, 0.3)" },
+          ]}
+        >
+          <View
+            style={[
+              styles.processingContainer,
+              { backgroundColor: colors.white },
+            ]}
+          >
+            <Animated.View
+              style={[
+                styles.spinner,
+                {
+                  transform: [{ rotate: spin }],
+                  borderColor: colors.transparent,
+                  borderTopColor: colors.primary[500],
+                  borderRightColor: colors.primary[500],
+                },
+              ]}
+            />
+            <Text
+              style={[styles.processingText, { color: colors.accent[500] }]}
+            >
+              Generating recipes...
+            </Text>
+            <Text style={[styles.progressText, { color: colors.accent[500] }]}>
+              {Math.round(progress)}%
+            </Text>
+          </View>
+        </View>
+      )}
 
       {/* Input Section */}
       <View style={styles.inputSection}>
@@ -283,5 +375,42 @@ const styles = StyleSheet.create({
     fontWeight: FontWeights.semibold,
     fontFamily: Fonts.semibold,
     fontSize: FontSizes.lg,
+  },
+  processingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1000,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  processingContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: Spacing[8],
+    borderRadius: BorderRadius.xl,
+    minWidth: 250,
+  },
+  spinner: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    borderWidth: 4,
+    marginBottom: Spacing[4],
+  },
+  processingText: {
+    fontSize: FontSizes.lg,
+    fontWeight: FontWeights.semibold,
+    fontFamily: Fonts.semibold,
+    marginBottom: Spacing[2],
+    textAlign: "center",
+  },
+  progressText: {
+    fontSize: FontSizes["2xl"],
+    fontWeight: FontWeights.bold,
+    fontFamily: Fonts.bold,
+    textAlign: "center",
   },
 });
