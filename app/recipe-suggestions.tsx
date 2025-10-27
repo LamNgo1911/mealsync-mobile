@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    paddingHorizontal: Spacing[6],
+    paddingHorizontal: Spacing[4],
   },
   title: {
     fontFamily: Fonts.semibold,

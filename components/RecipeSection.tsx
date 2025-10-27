@@ -67,28 +67,50 @@ export function RecipeSection({
               </Text>
             </Pressable>
           </View>
-          <ScrollView
-            style={styles.gridScrollView}
-            showsVerticalScrollIndicator={true}
-            nestedScrollEnabled={true}
-          >
-            <View style={styles.gridContainer}>
-              {loading
-                ? Array.from({ length: 4 }).map((_, index) => (
-                    <View key={`skeleton-${index}`} style={styles.gridItem}>
-                      <SkeletonCard />
-                    </View>
-                  ))
-                : displayRecipes.map((item) => (
-                    <View key={item.id} style={styles.gridItem}>
-                      <RecipeCard
-                        recipe={item}
-                        onPress={() => handleRecipePress(item)}
-                      />
-                    </View>
-                  ))}
+          {loading ? (
+            <ScrollView
+              style={styles.gridScrollView}
+              showsVerticalScrollIndicator={true}
+              nestedScrollEnabled={true}
+            >
+              <View style={styles.gridContainer}>
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <View key={`skeleton-${index}`} style={styles.gridItem}>
+                    <SkeletonCard />
+                  </View>
+                ))}
+              </View>
+            </ScrollView>
+          ) : displayRecipes.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={[styles.emptyStateIcon, { color: colors.neutral[400] }]}>
+                📝
+              </Text>
+              <Text style={[styles.emptyStateText, { color: colors.neutral[600] }]}>
+                No recipes found
+              </Text>
+              <Text style={[styles.emptyStateSubtext, { color: colors.neutral[500] }]}>
+                Create your first recipe to get started
+              </Text>
             </View>
-          </ScrollView>
+          ) : (
+            <ScrollView
+              style={styles.gridScrollView}
+              showsVerticalScrollIndicator={true}
+              nestedScrollEnabled={true}
+            >
+              <View style={styles.gridContainer}>
+                {displayRecipes.map((item) => (
+                  <View key={item.id} style={styles.gridItem}>
+                    <RecipeCard
+                      recipe={item}
+                      onPress={() => handleRecipePress(item)}
+                    />
+                  </View>
+                ))}
+              </View>
+            </ScrollView>
+          )}
         </View>
       </View>
     );
@@ -226,5 +248,28 @@ const styles = StyleSheet.create({
   recipeCardContainer: {
     marginRight: Spacing[4],
     width: 192,
+  },
+  emptyState: {
+    paddingVertical: Spacing[10],
+    paddingHorizontal: Spacing[6],
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 200,
+  },
+  emptyStateIcon: {
+    fontSize: 48,
+    marginBottom: Spacing[3],
+  },
+  emptyStateText: {
+    fontSize: FontSizes.lg,
+    fontWeight: FontWeights.semibold,
+    fontFamily: Fonts.semibold,
+    marginBottom: Spacing[2],
+    textAlign: "center",
+  },
+  emptyStateSubtext: {
+    fontSize: FontSizes.sm,
+    fontFamily: Fonts.regular,
+    textAlign: "center",
   },
 });

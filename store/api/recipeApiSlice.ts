@@ -115,6 +115,35 @@ export const recipeApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, id) => [{ type: "Recipe", id }],
     }),
+    getSavedRecipes: builder.query<
+      TransformedPaginatedRecipesResponse,
+      { page?: number; limit?: number }
+    >({
+      query: ({ page = 1, limit = 10 }) => {
+        const offset = (page - 1) * limit;
+        const params = new URLSearchParams({
+          offset: String(offset),
+          limit: String(limit),
+        });
+        return `/saved?${params.toString()}`;
+      },
+      transformResponse: (response: PaginatedRecipesResponse) => {
+        return {
+          data: response.data,
+          totalPages: Math.ceil(response.totalElements / response.limit) || 1,
+        };
+      },
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.data.map(({ id }) => ({
+                type: "Recipe" as const,
+                id,
+              })),
+              { type: "Recipe", id: "SAVED_LIST" },
+            ]
+          : [{ type: "Recipe", id: "SAVED_LIST" }],
+    }),
   }),
 });
 
@@ -126,6 +155,7 @@ export const {
   useGetRecipesQuery,
   useUpdateRecipeMutation,
   useDeleteRecipeMutation,
+  useGetSavedRecipesQuery,
 } = recipeApiSlice;
 
 // Helper function to transform UserPreference to backend format
