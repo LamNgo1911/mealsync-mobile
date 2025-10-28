@@ -16,7 +16,11 @@ import { SearchBar } from "../../components/SearchBar";
 import { TodaysPick } from "../../components/TodaysPick";
 import { Fonts, FontSizes, FontWeights, Spacing } from "../../constants/theme";
 import { useTheme } from "../../context/ThemeContext";
-import { useGetRecipesQuery } from "../../store/api/recipeApiSlice";
+import {
+  useGetRecentGeneratedRecipesQuery,
+  useGetRecipesQuery,
+  useGetTodaysPicksQuery,
+} from "../../store/api/recipeApiSlice";
 
 export default function HomeScreen() {
   const { colors } = useTheme();
@@ -24,11 +28,17 @@ export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
 
+  // Fetch Today's Picks
   const {
-    data: recommendedRecipes,
-    isLoading: isLoadingRecommended,
-    isError: isErrorRecommended,
-  } = useGetRecipesQuery({ page: 1, limit: 10 });
+    data: todaysPicksData,
+    isLoading: isLoadingTodaysPicks,
+  } = useGetTodaysPicksQuery();
+
+  // Fetch Recent Generated Recipes
+  const {
+    data: recentRecipesData,
+    isLoading: isLoadingRecent,
+  } = useGetRecentGeneratedRecipesQuery({ limit: 6 });
 
   // Fetch search results when there's a search query
   const { data: searchResults, isLoading: isLoadingSearch } =
@@ -46,11 +56,10 @@ export default function HomeScreen() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Get the first 2 recipes as today's picks
-  const todaysPicks =
-    recommendedRecipes?.data && recommendedRecipes.data.length >= 2
-      ? recommendedRecipes.data.slice(0, 2)
-      : [];
+  const todaysPicks = todaysPicksData?.data ?? [];
+  const recentRecipes = recentRecipesData?.data ?? [];
+  console.log("todaysPicks: ", todaysPicks);
+  console.log("recentRecipes: ", recentRecipes);
 
   const handleSearch = (query: string) => {
     console.log("Search query:", query);
@@ -130,15 +139,15 @@ export default function HomeScreen() {
           ) : (
             <>
               {/* Today's Pick Section */}
-              {todaysPicks.length > 0 && !isLoadingRecommended && (
+              {todaysPicks.length > 0 && !isLoadingTodaysPicks && (
                 <TodaysPick recipes={todaysPicks} />
               )}
 
               {/* Recent Recipes Section */}
               <RecipeSection
                 title="Your Recent Recipes"
-                recipes={recommendedRecipes?.data?.slice(2) ?? []}
-                loading={isLoadingRecommended}
+                recipes={recentRecipes}
+                loading={isLoadingRecent}
                 layout="grid"
               />
             </>

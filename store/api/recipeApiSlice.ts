@@ -31,6 +31,20 @@ interface TransformedPaginatedRecipesResponse {
   totalPages: number;
 }
 
+interface DetectIngredientsBody {
+  textInput: string;
+}
+
+interface DetectIngredientsResponse {
+  success: boolean;
+  data: string[];
+}
+
+interface UnsaveRecipeBody {
+  userId: string;
+  recipeId: string;
+}
+
 export const recipeApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     generateRecipes: builder.mutation<{ data: Recipe[] }, GenerateRecipesBody>({
@@ -144,6 +158,37 @@ export const recipeApiSlice = apiSlice.injectEndpoints({
             ]
           : [{ type: "Recipe", id: "SAVED_LIST" }],
     }),
+    detectIngredientsFromText: builder.mutation<DetectIngredientsResponse, DetectIngredientsBody>({
+      query: (body) => ({
+        url: "/recipes/detect-ingredients-from-text",
+        method: "POST",
+        body,
+      }),
+    }),
+    unsaveRecipe: builder.mutation<void, UnsaveRecipeBody>({
+      query: (body) => ({
+        url: "/recipes/save",
+        method: "DELETE",
+        body,
+      }),
+      invalidatesTags: (result, error, { userId }) => [
+        { type: "User", id: userId },
+        { type: "Recipe", id: "SAVED_LIST" },
+      ],
+    }),
+    getTodaysPicks: builder.query<{ data: Recipe[] }, void>({
+      query: () => "/recipes/today-picks",
+      providesTags: [{ type: "Recipe", id: "TODAY_PICKS" }],
+    }),
+    getRecentGeneratedRecipes: builder.query<{ data: Recipe[] }, { limit?: number }>({
+      query: ({ limit = 6 }) => {
+        const params = new URLSearchParams({
+          limit: String(limit),
+        });
+        return `/recipes/recent?${params.toString()}`;
+      },
+      providesTags: [{ type: "Recipe", id: "RECENT" }],
+    }),
   }),
 });
 
@@ -156,6 +201,10 @@ export const {
   useUpdateRecipeMutation,
   useDeleteRecipeMutation,
   useGetSavedRecipesQuery,
+  useDetectIngredientsFromTextMutation,
+  useUnsaveRecipeMutation,
+  useGetTodaysPicksQuery,
+  useGetRecentGeneratedRecipesQuery,
 } = recipeApiSlice;
 
 // Helper function to transform UserPreference to backend format
